@@ -1,0 +1,79 @@
+
+@if(!this.cargando())
+{
+    <div class="container-principal-nav">
+        <div class="container-nav d-flex align-items-center justify-content-center mt-4">
+            <h1>LISTA DE USUARIOS</h1>
+        </div>
+    </div>
+    <div class="table-responsive pt-4">
+        <table class="table align-middle tabla-usuarios">
+            <thead class="table-dark">
+                <tr>
+                <th>Avatar</th>
+                <th>Nombre Usuario</th>
+                <th>Email</th>
+                <th>Nombre Completo</th>
+                <th>Fecha Nacimiento</th>
+                <th>Admin</th>
+                <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (usuario of arrayUsuarios(); track $index)
+                {
+                <tr class="container-tabla">
+                    <td>
+                        <div class="view cursor-pointer">
+                            @if(usuario.avatar)
+                            {
+                                <img [src]="usuario.avatar" alt="miAvatar" [routerLink]="['/perfil', usuario._id]">
+                            }
+                            @else
+                            {
+                                <img src="/assets/User.svg" alt="subir" [routerLink]="['/perfil', usuario._id]">
+                            }
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="d-flex justify-content-start">
+                            <p class="cursor-pointer m-0" [routerLink]="['/perfil', usuario._id]">{{ usuario.nombreUsuario }}</p>
+                        </div>
+                    </td>
+                    <td>{{ usuario.correo }}</td>
+
+                    <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                    
+                    <td>{{ usuario.fechaDeNacimiento | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                    <span class="d-flex align-items-center ms-3">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" id="admin" class="form-check-input color" [checked]="usuario.admin? true: false" (change)="cambiarAdmin(usuario._id, $event)">
+                        </div>
+                    </span>
+                    </td>
+
+                    <td>
+                        @if(usuario.baneado)
+                        {
+                            <img src="/assets/Ban-Rojo.svg" alt="BanearRojo" class="icono" title="Banear Usuario" (click)="banearUsuario(usuario._id, usuario.baneado)">
+                        }
+                        @else
+                        {
+                            <img src="/assets/Ban.svg" alt="Banear" class="icono" title="Banear Usuario" (click)="banearUsuario(usuario._id, usuario.baneado)">
+                        }
+                        <img src="/assets/Trash.svg" alt="Eliminar" class="icono" title="Eliminar Usuario" (click)="eliminarUsuario(usuario._id)">
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        <button class="btn btn-secondary mt-4 mb-5 boton" routerLink="/registro">CREAR USUARIO</button>
+    </div>   
+}
+@else
+{
+    <app-loading></app-loading>
+}

@@ -1,0 +1,103 @@
+.container-principal-nav
+{
+    width: 100%;
+    position: absolute;
+    z-index: -5;
+}
+.container-nav
+{
+    margin: auto;
+    padding-left: 200px;
+}
+
+
+.table-responsive
+{
+    margin-left: 250px;;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tabla-usuarios
+{
+    border-radius: 15px;
+    max-width: 90%;
+    overflow: hidden;
+}
+.tabla-usuarios thead th
+{
+    padding: 15px;
+}
+.container-tabla td
+{
+    color: white;
+    background-color: rgb(14, 39, 48);
+    padding: 12px;
+}
+.cursor-pointer
+{
+    cursor: pointer;
+}
+
+.view
+{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.view img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.icono
+{
+    width: 30px;
+    margin-right: 7px;
+    cursor: pointer;
+    transition: transform .2s;
+}
+.icono:hover
+{
+    transform: scale(1.09);
+}
+.icono:active
+{
+    transform: scale(0.80);
+}
+
+.color
+{
+	border: 2px solid #D47100;
+	box-shadow: none !important;
+    cursor: pointer;
+}
+.color:checked
+{
+	box-shadow: none !important;
+  	background-color: #D47100;
+  	border-color: #D47100;
+}
+.form-check.form-switch
+{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-check-label
+{
+	margin-bottom: -3px !important;
+}
+
+.boton
+{
+    width: 20%;
+}

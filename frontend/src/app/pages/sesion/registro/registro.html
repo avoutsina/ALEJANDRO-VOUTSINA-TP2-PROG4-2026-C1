@@ -1,0 +1,172 @@
+<div class="d-flex flex-column align-items-center min-vh-100 mb-5"
+            [ngStyle]="{ 'margin-left': this.authService.getPermiso ? '250px' : '0px' }">
+
+    <div class="d-flex justify-content-center container-logo">
+        <img src="/assets/Logo.svg" alt="logo" width="550px">
+    </div>
+    <div class="container_principal">
+        <div class="container">
+            <h2 class="text-center mb-4">Registrarse</h2>
+            <form [formGroup]="formularioRegistro" (ngSubmit)="register()" class="row g-4">
+                <div class="col-md-6">
+                    <label for="nombre" class="mb-1">Nombre</label>
+                    <input type="text" id="nombre" placeholder="Ingrese su nombre" formControlName="nombre" class="form-control">
+                    @if(getNombre.errors?.["required"] && getNombre.touched)
+                    {
+                        <small class="error">Campo requerido</small>
+                    }
+                    @if((getNombre.errors?.["minlength"] || getNombre.errors?.["maxlength"]) && getNombre.touched)
+                    {
+                        <small class="error">Ingrese un nombre válido</small>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label for="apellido" class="mb-1">Apellido</label>
+                    <input type="text" id="apellido" placeholder="Ingrese su apellido" formControlName="apellido" class="form-control">
+                    @if(getApellido.errors?.["required"] && getApellido.touched)
+                    {
+                        <small class="error">Campo requerido</small>
+                    }
+                    @if((getApellido.errors?.["minlength"] || getApellido.errors?.["maxlength"]) && getApellido.touched)
+                    {
+                        <small class="error">Ingrese un apellido válido</small>
+                    }
+                </div>
+
+                <div class="col-12">
+                    <label for="nombreUsuario" class="mb-1">Nombre de usuario</label>
+                    <input type="text" id="nombreUsuario" placeholder="Ingrese su nombre de usuario"
+                           formControlName="nombreUsuario" class="form-control">
+                    @if(getNombreUsuario.errors?.["required"] && getNombreUsuario.touched)
+                    {
+                        <small class="error">Campo requerido</small>
+                    }
+                    @if(getNombreUsuario.errors?.["pattern"])
+                    {
+                        <small class="error">Debe contener solo números y letras</small>
+                    }
+                    @else if((getNombreUsuario.errors?.["minlength"] || getNombreUsuario.errors?.["maxlength"]) && getNombreUsuario.touched)
+                    {
+                        <small class="error">Ingrese un usuario válido</small>
+                    }
+                </div>
+
+                <div class="col-12">
+                    <label for="correo" class="mb-1">Correo</label>
+                    <input type="text" id="correo" placeholder="Ingrese su correo"
+                           formControlName="correo" class="form-control">
+                    @if(getCorreo.errors?.["required"] && getCorreo.touched)
+                    { 
+                        <small class="error">Campo requerido</small>
+                    }
+                    @if((getCorreo.errors?.["minlength"] || getCorreo.errors?.["maxlength"] || getCorreo.errors?.["email"]) && getCorreo.touched)
+                    { 
+                        <small class="error">Ingrese un correo válido</small>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label for="password" class="mb-1">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingrese su contraseña"
+                           formControlName="contrasenia" class="form-control">
+                    @if(getContrasenia.errors?.["required"] && getContrasenia.touched)
+                    { 
+                        <small class="error">Campo requerido</small>
+                    }
+                    @if(getContrasenia.errors?.["pattern"] && getContrasenia.touched)
+                    { 
+                        <small class="error">Debe tener 8 caracteres, una mayúscula y un número</small>
+                    }
+                    @else if((getContrasenia.errors?.["minlength"] || getContrasenia.errors?.["maxlength"]) && getContrasenia.touched)
+                    { 
+                        <small class="error">Ingrese una contraseña válida</small>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label for="repetirContrasenia" class="mb-1">Repetir contraseña</label>
+                    <input type="password" id="repetirContrasenia" placeholder="Repita su contraseña"
+                           formControlName="repetirContrasenia" class="form-control">
+                    @if(getRepetirContrasenia.errors?.["required"] && getRepetirContrasenia.touched)
+                    { 
+                        <small class="error">Campo requerido</small>
+                    }
+                    @if(getRepetirContrasenia.errors?.["iguales"] && getRepetirContrasenia.touched)
+                    {
+                        <small class="error">Las contraseñas no coinciden</small>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label for="descripcion" class="mb-1">Descripción</label>
+                    <textarea id="descripcion" placeholder="Descripción" formControlName="descripcion" class="form-control"></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="fechaNacimiento" class="mb-1">Fecha de nacimiento</label>
+                    <input type="date" id="fechaNacimiento" placeholder="dd/mm/yyyy" formControlName="fechaNacimiento" class="form-control">
+                    @if(getFechaNacimmiento.errors?.["required"] && getFechaNacimmiento.touched)
+                    {
+                        <small class="error">Campo requerido</small>
+                    }
+                </div>
+
+                <div class="col-md-12 mb-4 mt-4"> 
+                    <div class="d-flex justify-content-center align-items-center gap">
+                        <div class="d-grid gap-3">
+                            <img src="/assets/Logo2.svg" alt="" width="250px" class="m-auto">
+                            <label class="mb-3 text-center">Sube una foto de perfil para que<br>
+                                                            los demas usuarios sepan quien eres<br>
+                            </label>
+                        </div>
+                        <input type="file" #agregarImagen hidden (change)="imagenClass.mostrarImagen($event)" accept="image/png, image/jpeg"> 
+                        @if (imagenClass.reviewUrl)
+                        {
+                            <div class="review">
+                                <img [src]="imagenClass.reviewUrl" alt="imagen">
+                            </div>
+                        }
+                        @else
+                        {
+                            <div class="d-grid gap-3">
+                                <img src="/assets/User.svg" alt="subir" (click)="agregarImagen.click()" class="boton-subir">
+                                <label class="m-auto">Avatar</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                @if(!this.authService.getPermiso)
+                {
+                    <div class="col-12 mt-3">
+                        <button class="btn btn-secondary w-100" [disabled]="!this.formularioRegistro.valid">Aceptar</button>
+                    </div>
+                }
+                @else
+                {
+                    <div class="d-flex gap-5">
+                        <button class="btn btn-secondary w-50" routerLink="/usuarios">Volver</button>
+                        <button class="btn btn-secondary w-50" [disabled]="!this.formularioRegistro.valid">Aceptar</button>
+                    </div>
+                }
+            </form>
+            @if(!this.authService.getPermiso)
+            {
+                <div class="row mt-4">
+                    <p class="text-center">Si ya tenés cuenta, <a routerLink="/login" class="link">¡Iniciá sesión!</a>
+                    </p>
+                </div>
+            }
+            @if(this.authService.getPermiso)
+            {
+                <div [formGroup]="formularioRegistro" class="mt-4 d-flex gap-3">
+                    <div class="form-check form-switch">
+                        <input type="checkbox" id="admin" formControlName="admin" class="form-check-input color">
+                        <label for="admin" class="form-check-label">ADMINISTRADOR</label>
+                    </div>
+                    <p class="info">Permisos para manipular usuarios y publicaciones (Interfaz Adicional)</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

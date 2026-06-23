@@ -1,0 +1,17 @@
+@if(this.authService.estado())
+{
+    <div class="nav d-flex flex-column align-items-center">
+        <img src="/assets/Logo.svg" alt="logo" width="200px">
+        <div class="d-flex flex-column gap-4 mt-5 align-items-center">
+            <button routerLink="inicio" class="btn btn-secondary">Inicio</button>
+            <button routerLink="perfil" class="btn btn-secondary">Perfil</button>
+            @if(this.getPermiso)
+            {
+                <button routerLink="usuarios" class="btn btn-secondary">Usuarios</button>
+                <button routerLink="estadisticas" class="btn btn-secondary">Estadisticas</button>
+            }
+            <button class="btn btn-secondary" (click)="cerrarSesion()">Cerrar Sesion</button>
+        </div>
+    </div>
+}
+<router-outlet />

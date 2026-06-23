@@ -1,0 +1,36 @@
+import { Type } from "class-transformer";
+import { IsDefined, IsNumber, IsOptional, IsString } from "class-validator";
+import { Comentario } from "../entities/comentario";
+
+export class CreatePublicacioneDto
+{
+    @IsString()
+    @IsDefined()
+    userId : string;
+
+    @IsString()
+    @IsDefined()
+    urlImg : string;
+
+    @IsString()
+    descripcion: string;
+
+    @IsString()
+    @IsDefined()
+    nombreUsuario: string;
+
+    @IsString()
+    avatar: string;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    meGusta: number;
+
+    @IsString()
+    @IsOptional({ each: true })
+    meGustaId: string[];
+
+    @IsOptional()
+    comentarios: Comentario[];
+}

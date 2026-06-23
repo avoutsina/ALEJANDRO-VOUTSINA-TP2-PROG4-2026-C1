@@ -1,0 +1,56 @@
+@if(!this.cargando())
+{
+    <div class="container-principal-nav">
+        <div class="container-nav d-flex align-items-center justify-content-center mt-4">
+            <h1>ESTADISTICAS</h1>
+        </div>
+    </div>
+    <div class="container-estadisticas d-flex align-items-center gap-5">
+        <div class="d-flex flex-column gap-4 align-items-start">
+            <h3 class="m-0">Cantidad de publicaciones por usuario</h3>
+            <h5 class="m-0">Elige un periodo</h5>
+            <div class="d-flex align-items-center justify-content-center gap-4">
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="desde" class="ms-2">Desde</label>
+                    <input type="date" id="desde" class="calendario" [ngModel]="desde()" (ngModelChange)="desde.set($event)"/>
+                </div>
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="hasta" class="ms-2">Hasta</label>
+                    <input type="date" id="hasta" class="calendario" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)"/>
+                </div>
+                <div>
+                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticas()">Aplicar</button>
+                </div>
+            </div>
+            <div class="p-3 container-charts">
+                <canvas id="miChart"></canvas>
+            </div>
+        </div>
+
+
+        <div class="d-flex flex-column gap-4 align-items-start">
+            <h3 class="m-0">Cantidad de comentarios por dia</h3>
+            <h5 class="m-0">Elige un periodo</h5>
+            <div class="d-flex align-items-center justify-content-center gap-4">
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="desde" class="ms-2">Desde</label>
+                    <input type="date" id="desde" class="calendario" [ngModel]="desdeComentarios()" (ngModelChange)="desdeComentarios.set($event)"/>
+                </div>
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="hasta" class="ms-2">Hasta</label>
+                    <input type="date" id="hasta" class="calendario" [ngModel]="hastaComentarios()" (ngModelChange)="hastaComentarios.set($event)"/>
+                </div>
+                <div>
+                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticasComentarios()">Aplicar</button>
+                </div>
+            </div>
+            <div class="p-3 container-charts">
+                <canvas id="miChartComentarios"></canvas>
+            </div>
+        </div>
+    </div>
+}
+@else
+{
+    <app-loading></app-loading>
+}

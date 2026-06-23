@@ -1,0 +1,43 @@
+.container-principal-nav
+{
+    width: 100%;
+    position: absolute;
+    z-index: -5;
+}
+.container-nav
+{
+    margin: auto;
+    padding-left: 200px;
+}
+.container-estadisticas
+{
+    padding-left: 350px;
+    width: 100%;
+    min-height: 100vh;
+}
+.container-charts
+{
+    width: 700px;
+    height: 450px;
+    border: 1px solid  rgb(212, 113, 0);
+    border-radius: 15px;
+}
+.calendario
+{
+    border-radius: 10px;
+    padding: 5px;
+    color: black;
+}
+button
+{
+	border-radius: 10px;
+	transition: transform .2s;
+}
+button:hover
+{
+    transform: scale(1.08);
+}
+button:active
+{
+    transform: scale(1.0);
+}

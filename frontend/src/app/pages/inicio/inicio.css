@@ -1,0 +1,285 @@
+.container-principal
+{
+    padding-left: 38vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-ordenar
+{
+    position: fixed;
+    margin-left: 300px;
+    font-size: 1.3rem;
+}
+.container-ordenar select
+{
+    background-color: rgb(14, 39, 48);
+    color: white;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: transform .2s;
+    appearance: none;
+
+
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='white'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+}
+.container-ordenar select:hover
+{
+    transform: scale(1.03);
+}
+
+
+.container-cards
+{
+    width: 80%;
+}
+
+.cards
+{
+    background-color: rgb(14, 39, 48);
+    border-radius: 20px;
+}
+
+.view
+{
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.view img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cursor-pointer
+{
+    cursor: pointer;
+}
+
+.container-foto
+{
+    width: 52vh;
+    position: relative;
+}
+.container-foto img
+{
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+}
+.container-ver-imagen
+{
+    position: absolute;
+    border-radius: 20px;
+    inset: 0;
+    transition: background-color 0.3s ease;
+}
+.verImagen
+{
+    display: none;   
+    position: relative;
+    border-radius: 10px;
+    border: none;
+}
+.container-foto:hover .verImagen
+{
+  display: block;
+  background-color: #d47100b9;
+}
+.container-ver-imagen:hover
+{
+  background-color: rgba(0, 0, 0, 0.406);
+}
+
+
+.container-stats
+{
+    padding: 12px 25px;
+}
+.container-stats img
+{
+    width: 34px;
+    margin-right: 7px;
+}
+.icono
+{
+    cursor: pointer;
+    transition: transform .2s;
+}
+.icono:hover
+{
+    transform: scale(1.05);
+}
+.icono:active
+{
+    transform: scale(0.70);
+}
+
+.descripcion
+{
+    max-width: 490px;
+}
+
+@keyframes pulso-cargando
+{
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;   
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.cargando
+{
+  animation: pulso-cargando 1.5s infinite ease-in-out;
+}
+.imagen-comentario
+{
+    width: 45px !important;
+    height: 45px !important;
+}
+.usuario-comentario
+{
+    width: 35px !important;
+    height: 35px !important;
+}
+.container-comentarios
+{
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 8px;
+    scrollbar-width: none;
+}
+
+/*SCROLL*/
+.container-comentarios::-webkit-scrollbar
+{
+    width: 0px; /* Oculto */
+}
+.container-comentarios:hover
+{
+    scrollbar-width: auto;
+}
+.container-comentarios:hover::-webkit-scrollbar
+{
+    width: 5px;     /* Grosor */
+}
+
+.container-comentarios::-webkit-scrollbar-track
+{
+    background: #888; /* color del fondo */
+    border-radius: 8px;
+}
+
+.container-comentarios::-webkit-scrollbar-thumb
+{
+    background: #D47100;        /* color del scroll */
+    border-radius: 8px;
+}
+
+.container-comentarios::-webkit-scrollbar-thumb:hover
+{
+    background: #555;        /* color al hover */
+}
+/*/////////////////////////////////////////////////////////*/
+
+.box-comment
+{
+    max-width: 420px;
+}
+.container-comentario:hover .container-edits
+{
+    display: inline-flex !important;
+}
+.container-edits
+{
+    display: none;
+}
+.container-edits img
+{
+    cursor: pointer;
+    width: 21px;
+}
+.container-edits img:hover
+{
+    transform: scale(1.1);
+}
+.container-edits img:active
+{
+    transform: scale(0.9);
+}
+
+.container-input
+{
+    width: 70%;
+}
+.input-coment
+{
+    border-radius: 15px;
+}
+
+.input-coment:focus
+{
+    box-shadow: 0 0 0 0.10rem rgba(212, 113, 0, 0.837);
+}
+
+
+.container-overlay
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.398);
+}
+.preview-overlay
+{
+    width: 70vh;
+    max-height: 85vh;
+    margin: auto;
+    background-color: rgb(14, 39, 48);
+    border-radius: 12px;
+}
+.preview-content
+{
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+.preview-img
+{
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+.boton-vista-previa
+{
+    width: 50%;
+    margin: auto;
+}
+

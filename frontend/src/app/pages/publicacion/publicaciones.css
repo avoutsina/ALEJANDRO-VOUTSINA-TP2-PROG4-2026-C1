@@ -1,0 +1,93 @@
+.error
+{
+	margin: 5px;
+	color: red;
+}
+.titulo
+{
+    margin-left: 250px;
+}
+.containerPubli
+{
+    margin-left: 250px;
+    width: 57%;
+    height: 450px;
+    border: 2px solid rgb(77, 77, 77);
+    border-radius: 10px;
+}
+.container-subir
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  min-height: 446px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.boton-subir
+{
+    width: 180px;
+    transition: transform 0.25s ease;
+}   
+.boton-subir:hover
+{
+    transform: scale(1.08);
+}   
+.boton-subir:active
+{
+    transform: scale(1.00);
+}
+.container-image
+{
+  background-color: rgb(14, 39, 48);
+  border-radius: 10px;
+  width: 100%;
+  height: 446px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.review
+{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+  display: block;
+}
+.boton
+{
+    width: 70%;
+}
+
+.descripcion-box
+{
+    background-color: #1e1e1e; 
+    width: 300px;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 1rem;
+    resize: none;
+    outline: none;
+    transition: border-color .25s ease, box-shadow .25s ease;
+}
+
+.descripcion-box:focus
+{
+    border-color: rgb(14, 39, 48);
+    box-shadow: 0 0 10px rgb(14, 39, 48);
+    background-color: #262626;
+}
+.descripcion-box::placeholder
+{
+    color: #aaa;
+}

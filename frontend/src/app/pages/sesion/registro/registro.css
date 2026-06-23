@@ -1,0 +1,107 @@
+.error
+{
+	padding: 5px;
+	color: red;
+}
+.link
+{
+	color: #D47100;
+	text-decoration: none;
+	cursor: pointer;
+}
+.container_principal
+{
+	width: 50%;
+	background-color: rgb(14, 39, 48);
+	border-radius: 10px;
+	padding: 35px;
+}
+
+.input-grande 
+{
+	height: 40px;
+	font-size: 1rem;
+	color: black;
+}
+label
+{
+	font-size: large;
+}
+input.form-control:focus
+{
+	box-shadow: 0 0 0 0.15rem rgba(212, 113, 0, 0.837);
+}
+textarea.form-control:focus
+{
+	box-shadow: 0 0 0 0.15rem rgba(212, 113, 0, 0.837);
+}
+.container-logo
+{
+	padding: 50px;
+}
+.review
+{
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid white;
+}
+.review img
+{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gap
+{
+	gap: 150px;
+}
+.boton-subir
+{
+    width: 170px;
+    transition: transform 0.25s ease;
+}   
+.boton-subir:hover
+{
+    transform: scale(1.08);
+}   
+.boton-subir:active
+{
+    transform: scale(1.00);
+}
+
+.color
+{
+	cursor: pointer;
+	border: 2px solid #D47100;
+	box-shadow: none !important;
+}
+
+.color:checked
+{
+	box-shadow: none !important;
+  	background-color: #D47100;
+  	border-color: #D47100;
+}
+
+.form-check.form-switch
+{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-check-label
+{
+	margin-bottom: -3px !important;
+}
+.info
+{
+	color: rgb(91, 91, 91);
+	margin-bottom: -3px
+}

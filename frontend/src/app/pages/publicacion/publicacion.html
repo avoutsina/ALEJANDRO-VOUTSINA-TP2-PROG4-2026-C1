@@ -1,0 +1,61 @@
+<div class="pb-5 pt-4">
+    <h1 class="text-center titulo">CREAR PUBLICACION</h1>
+</div>
+<div class="container mb-5">
+    <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center containerPubli">
+            <form [formGroup]="fomularioPublicacion" class="d-grid gap-5" (ngSubmit)="crearPublicacion()">
+                <div class="d-flex gap-2">
+                    <div>
+                        <input type="file" hidden #agregarImagen accept="image/*" (change)="imagenClass.mostrarImagen($event)">
+                        <div class="container-image d-flex align-center text-center">
+                            @if (imagenClass.reviewUrl)
+                            {
+                                <img [src]="imagenClass.reviewUrl" alt="imagen" class="review">
+                            }
+                            @else
+                            {
+                                <div class="container-subir">
+                                    <img src="/assets/Imagen.svg" alt="subir" (click)="agregarImagen.click()" class="boton-subir">
+                                    <label class="fs-5">Seleccionar imagen desde mi computadora</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <div class="p-4">
+                            <div class="mb-3">
+                                <h4>{{getNombreUsuario | uppercase}} </h4>
+                            </div>
+                            <h6 class="fs-5 mb-3">Descripción</h6>
+                            
+                            <textarea
+                                formControlName="descripcion"
+                                class="form-control descripcion-box mb-1"
+                                rows="5"
+                                placeholder="Escribí una descripción..."
+                            ></textarea>
+                            
+                            @if(getDescripcion.errors?.['maxlength'] && getDescripcion.touched)
+                            {
+                                <small class="error">Máximo 100 caracteres</small>
+                            }
+                            @if(!imagenClass.reviewUrl && getDescripcion.touched)
+                            {
+                                <small class="error">Debes subir una imagen</small>
+                            }
+                        </div>
+                        <div class="d-grid gap-5">
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-secondary fs-5" [disabled]="!imagenClass.reviewUrl || !this.fomularioPublicacion.valid">Publicar</button>
+                            </div>
+                            <div class="text-center">
+                                <button class="btn btn-secondary fs-6 boton" routerLink="/perfil">Volver</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

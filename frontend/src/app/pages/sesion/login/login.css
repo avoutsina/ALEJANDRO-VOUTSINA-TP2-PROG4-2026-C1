@@ -1,0 +1,33 @@
+.error
+{
+	padding: 5px;
+	color: red;
+}
+.link
+{
+	color: #D47100;
+	text-decoration: none;
+	cursor: pointer;
+}
+.container_principal
+{
+	width: 50%;
+	background-color: rgb(14, 39, 48);
+	border-radius: 10px;
+	padding: 35px;
+}
+
+.input-grande 
+{
+	height: 40px;
+	font-size: 1rem;
+	color: black;
+}
+label
+{
+  font-size: large;
+}
+.container-logo
+{
+	padding: 50px;
+}
