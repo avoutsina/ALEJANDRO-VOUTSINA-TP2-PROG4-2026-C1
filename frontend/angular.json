@@ -13,6 +13,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": {
+              "base": "dist/Alejandro-Voutsina-TP2-PROG4-2026-C1",
+              "browser": ""
+            },
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
