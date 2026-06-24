@@ -22,7 +22,7 @@ Backend (Render):
 
 Post-deploy checklist
 
-- In `frontend/src/environments/environments.ts` set `apiUrl` to your Render backend URL (already set to `https://alejandro-voutsina-tp-2-prog4-2026-c1-79a1.onrender.com` in this repository).
+- In `frontend/src/environments/environments.ts` set `apiUrl` to your Render backend URL (already set to `https://alejandro-voutsina-tp2-prog4-2026-c1-79a1.onrender.com` in this repository).
 - Ensure MongoDB Atlas allows connections from Render outbound IP ranges (Render outbound IPs shown in their dashboard) or use 0.0.0.0/0 temporarily.
 - Verify CORS in backend: `backend/src/main.ts` already enables CORS globally.
 
