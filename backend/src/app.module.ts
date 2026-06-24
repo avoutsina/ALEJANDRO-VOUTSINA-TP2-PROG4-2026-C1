@@ -28,5 +28,5 @@ import { PublicacionesModule } from './resources/publicaciones/publicaciones.mod
 })
 export class AppModule
 {
-  // Aca se llaman a los distintos modulos
+
 }

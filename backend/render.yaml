@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ALEJANDRO-VOUTSINA-TP2-PROG4-2026-C1
+    env: node
+    plan: free
+    branch: main
+    region: oregon
+    buildCommand: 'npm install && npm run build'
+    startCommand: 'npm run start:prod'
+    disk: 512
+    healthCheckPath: '/'
+    autoDeploy: true
+    envVars:
+      - key: MONGODB_URI
+        value: '${MONGODB_URI}'
+        generateIfEmpty: false
