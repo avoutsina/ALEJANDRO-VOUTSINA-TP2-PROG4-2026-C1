@@ -10,6 +10,7 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { AutenticacionService } from './autenticacion.service';
 import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 import { CredencialesDto } from './dto/credencialesDto';
@@ -29,7 +30,7 @@ export class AutenticacionController {
   }
 
   @Post('register')
-  @UseInterceptors(FileInterceptor('avatar'))
+  @UseInterceptors(FileInterceptor('avatar', { storage: memoryStorage() }))
   async register(
     @Body() body: CreateUsuarioDto,
     @UploadedFile() file?: Express.Multer.File,
