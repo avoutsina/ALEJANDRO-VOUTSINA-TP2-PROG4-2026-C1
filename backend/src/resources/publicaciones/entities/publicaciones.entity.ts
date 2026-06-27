@@ -7,10 +7,13 @@ export class Publicaciones
 {
     _id!: ObjectId
 
+    @Prop({ required: true })
+    titulo!: string;
+
     @Prop({ required: true})
     userId!: string;
 
-    @Prop({ required: true })
+    @Prop({ required: false, default: "" })
     urlImg!: string;
 
     @Prop({ default: "" })
@@ -30,6 +33,9 @@ export class Publicaciones
 
     @Prop({ type: [ComentarioSchema], default: [] })
     comentarios!: Comentario[];
+
+    @Prop({ default: false })
+    eliminado!: boolean;
 
     @Prop({ default: Date.now })
     created_at!: Date;

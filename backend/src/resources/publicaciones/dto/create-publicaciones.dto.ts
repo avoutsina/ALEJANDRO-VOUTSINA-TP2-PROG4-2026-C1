@@ -6,13 +6,18 @@ export class CreatePublicacioneDto
 {
     @IsString()
     @IsDefined()
-    userId!: string;
+    titulo!: string;
 
     @IsString()
     @IsDefined()
+    userId!: string;
+
+    @IsString()
+    @IsOptional()
     urlImg!: string;
 
     @IsString()
+    @IsOptional()
     descripcion!: string;
 
     @IsString()

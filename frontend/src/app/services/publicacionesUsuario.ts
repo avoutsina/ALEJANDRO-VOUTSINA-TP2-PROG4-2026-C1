@@ -16,13 +16,12 @@ export class PublicacionesUsuario
     return { Authorization: `Bearer ${token ?? ''}` };
   }
 
-  traerPublicaciones(sort?: string): Observable<PublicacionM[]>
+  traerPublicaciones(sort?: string, offset?: number, limit?: number): Observable<PublicacionM[]>
   {
     let params = new HttpParams();
-    if (sort)
-    {
-      params = params.set('sort', sort);
-    }
+    if (sort) params = params.set('sort', sort);
+    if (offset !== undefined) params = params.set('offset', offset.toString());
+    if (limit !== undefined) params = params.set('limit', limit.toString());
     return this.httpClient.get<PublicacionM[]>(`${this.apiUrl}/inicio`,{ headers: this.getToken(), params });
   }
 
@@ -56,9 +55,19 @@ export class PublicacionesUsuario
   }
 
 
-  crearPublicacion(publicacion: Publicacion): Observable<Publicacion>
+  crearPublicacion(publicacion: Publicacion, file?: File | null): Observable<Publicacion>
   {
-    return this.httpClient.post<Publicacion>(`${this.apiUrl}/perfil/crear`, publicacion, { headers: this.getToken() });
+    const formData = new FormData();
+    formData.append('titulo', publicacion.titulo);
+    formData.append('userId', publicacion.userId);
+    formData.append('descripcion', publicacion.descripcion || '');
+    formData.append('nombreUsuario', publicacion.nombreUsuario);
+    formData.append('avatar', publicacion.avatar || '');
+    if (file) formData.append('file', file);
+    const token = localStorage.getItem('Token');
+    return this.httpClient.post<Publicacion>(`${this.apiUrl}/perfil/crear`, formData, {
+      headers: { Authorization: `Bearer ${token ?? ''}` }
+    });
   }
 
   modificarPublicacion(id : string , parametros: Partial<PublicacionM>)
@@ -68,11 +77,21 @@ export class PublicacionesUsuario
 
   eliminarPublicacion(id: string)
   {
-    return this.httpClient.delete<Publicacion>(`${this.apiUrl}/perfil/eliminar/${id}`, { headers: this.getToken() })
+    return this.httpClient.delete<PublicacionM>(`${this.apiUrl}/perfil/eliminar/${id}`, { headers: this.getToken() })
   }
   eliminarPublicaciones(userId?: string)
   {
-    return this.httpClient.delete<Publicacion>(`${this.apiUrl}/publicaciones/eliminar/${userId}`, { headers: this.getToken() })
+    return this.httpClient.delete<PublicacionM>(`${this.apiUrl}/publicaciones/eliminar/${userId}`, { headers: this.getToken() })
+  }
+
+  darLike(publicacionId: string): Observable<PublicacionM>
+  {
+    return this.httpClient.post<PublicacionM>(`${this.apiUrl}/publicaciones/${publicacionId}/like`, {}, { headers: this.getToken() });
+  }
+
+  quitarLike(publicacionId: string): Observable<PublicacionM>
+  {
+    return this.httpClient.delete<PublicacionM>(`${this.apiUrl}/publicaciones/${publicacionId}/like`, { headers: this.getToken() });
   }
 }
 
