@@ -4,13 +4,13 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 export class UsuarioC
 {
     @Prop({ required: true })
-    userId : string;
+    userId!: string;
 
     @Prop({ required: true })
-    nombreUsuario : string;
+    nombreUsuario!: string;
 
     @Prop()
-    avatar: string;
+    avatar!: string;
 }
 
 export const UsuarioCSchema = SchemaFactory.createForClass(UsuarioC);

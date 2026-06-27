@@ -13,8 +13,8 @@ export class UpdatePublicacioneDto extends PartialType(CreatePublicacioneDto)
 
     @IsString({ each: true })
     @IsOptional()
-    meGustaId: string[];
+    meGustaId!: string[];
 
     @IsOptional()
-    comentarios: Comentario[];
+    comentarios!: Comentario[];
 }

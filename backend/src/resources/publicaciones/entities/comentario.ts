@@ -5,13 +5,13 @@ import { UsuarioC, UsuarioCSchema } from "./usuarioC";
 export class Comentario
 {
     @Prop({ type: UsuarioCSchema,required: true })
-    usuario: UsuarioC;
+    usuario!: UsuarioC;
 
     @Prop({ required: true })
-    texto: string;
+    texto!: string;
 
     @Prop({ default: Date.now })
-    created_at: Date;
+    created_at!: Date;
 }
 
 export const ComentarioSchema = SchemaFactory.createForClass(Comentario);

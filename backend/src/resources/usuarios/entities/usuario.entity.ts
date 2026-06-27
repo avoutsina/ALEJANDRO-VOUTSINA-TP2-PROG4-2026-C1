@@ -4,40 +4,40 @@ import { type ObjectId } from "mongoose";
 @Schema()
 export class Usuario
 {
-    _id : ObjectId
+    _id !: ObjectId
 
     @Prop({ required: true })
-    nombre : string;
+    nombre !: string;
 
     @Prop({ required: true })
-    apellido : string;
+    apellido !: string;
 
     @Prop({ required: true })
-    correo : string;
+    correo !: string;
 
     @Prop({ required: true })
-    nombreUsuario : string;
+    nombreUsuario !: string;
 
     @Prop({ required: true })
-    contrasenia : string;
+    contrasenia !: string;
 
     @Prop()
-    descripcion : string;
+    descripcion !: string;
 
     @Prop()
-    avatar: string;
+    avatar!: string;
 
     @Prop({ required: true })
-    fechaDeNacimiento: Date;
+    fechaDeNacimiento!: Date;
 
     @Prop({ default: false })
-    admin: boolean;
+    admin!: boolean;
 
     @Prop({ default: new Date() })
-    created_at: Date;
+    created_at!: Date;
 
     @Prop({ default: false })
-    baneado: boolean;
+    baneado!: boolean;
 }
 
 export const UsuariosEschema = SchemaFactory.createForClass(Usuario);

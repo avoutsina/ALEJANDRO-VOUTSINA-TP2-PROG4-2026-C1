@@ -6,31 +6,31 @@ export class CreatePublicacioneDto
 {
     @IsString()
     @IsDefined()
-    userId : string;
+    userId!: string;
 
     @IsString()
     @IsDefined()
-    urlImg : string;
+    urlImg!: string;
 
     @IsString()
-    descripcion: string;
+    descripcion!: string;
 
     @IsString()
     @IsDefined()
-    nombreUsuario: string;
+    nombreUsuario!: string;
 
     @IsString()
-    avatar: string;
+    avatar!: string;
 
     @IsNumber()
     @IsOptional()
     @Type(() => Number)
-    meGusta: number;
+    meGusta!: number;
 
     @IsString()
     @IsOptional({ each: true })
-    meGustaId: string[];
+    meGustaId!: string[];
 
     @IsOptional()
-    comentarios: Comentario[];
+    comentarios!: Comentario[];
 }

@@ -5,34 +5,34 @@ import { Comentario, ComentarioSchema } from "./comentario";
 @Schema()
 export class Publicaciones
 {
-    _id: ObjectId
+    _id!: ObjectId
 
     @Prop({ required: true})
-    userId: string;
+    userId!: string;
 
     @Prop({ required: true })
-    urlImg: string;
+    urlImg!: string;
 
     @Prop({ default: "" })
-    descripcion: string;
+    descripcion!: string;
 
     @Prop({ required: true })
-    nombreUsuario: string;
+    nombreUsuario!: string;
 
     @Prop({ default: "" })
-    avatar: string;
+    avatar!: string;
 
     @Prop({ default: 0 })
-    meGusta: number;
+    meGusta!: number;
 
     @Prop({ default: [] })
-    meGustaId: string[];
+    meGustaId!: string[];
 
     @Prop({ type: [ComentarioSchema], default: [] })
-    comentarios: Comentario[];
+    comentarios!: Comentario[];
 
     @Prop({ default: Date.now })
-    created_at: Date;
+    created_at!: Date;
 }
 
 export const PublicacionesEschema = SchemaFactory.createForClass(Publicaciones);

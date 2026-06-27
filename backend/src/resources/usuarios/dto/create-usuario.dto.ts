@@ -5,31 +5,31 @@ export class CreateUsuarioDto
 {
     @IsString()
     @IsDefined()
-    nombre : string;
+    nombre!:string;
    
     @IsString()
     @IsDefined()
-    apellido : string;
+    apellido!: string;
 
     @IsString()
     @IsDefined()
-    correo : string;
+    correo!: string;
 
     @IsString()
     @IsDefined()
-    nombreUsuario : string;
+    nombreUsuario!: string;
 
     @IsString()
     @IsDefined()
-    contrasenia : string;
+    contrasenia!: string;
 
     @IsString()
     @IsOptional()
-    descripcion : string;
+    descripcion!: string;
 
     @Transform(({ value }) => new Date(value))
     @IsDefined()
-    fechaDeNacimiento : Date;
+    fechaDeNacimiento!: Date;
 
     @IsString()
     @IsOptional()
@@ -38,7 +38,7 @@ export class CreateUsuarioDto
     @Transform(({ value }) => value === 'true' || value === true)
     @IsBoolean()
     @IsDefined()
-    admin: boolean;
+    admin!: boolean;
 
     @Transform(({ value }) => value === 'true' || value === true)
     @IsBoolean()

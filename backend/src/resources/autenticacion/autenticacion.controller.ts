@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AutenticacionService } from './autenticacion.service';
-import { SupabaseService } from './supabase.service';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 import { CredencialesDto } from './dto/credencialesDto';
 import { CreateUsuarioDto } from '../usuarios/dto/create-usuario.dto';
 import { AuthGuard } from '../../guards/auth.guard';
@@ -20,7 +20,7 @@ import { AuthGuard } from '../../guards/auth.guard';
 export class AutenticacionController {
   constructor(
     private readonly autenticacionService: AutenticacionService,
-    private readonly supabaseService: SupabaseService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   @Post('login')
@@ -35,9 +35,9 @@ export class AutenticacionController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (file) {
-      const avatarUrl = await this.supabaseService.uploadImage(file);
-      if (avatarUrl) {
-        body.avatar = avatarUrl;
+      const uploadResult = await this.cloudinaryService.uploadImage(file);
+      if (uploadResult?.secure_url) {
+        body.avatar = uploadResult.secure_url;
       }
     }
     return this.autenticacionService.register(body);
@@ -49,3 +49,4 @@ export class AutenticacionController {
     return this.autenticacionService.verificar(autHeader);
   }
 }
+

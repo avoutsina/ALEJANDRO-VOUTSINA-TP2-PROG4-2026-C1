@@ -4,9 +4,9 @@ export class CredencialesDto
 {
     @IsString()
     @IsNotEmpty()
-    correo : string;
+    correo!: string;
 
     @IsString()
     @IsNotEmpty()
-    contrasenia : string;
+    contrasenia!: string;
 }
