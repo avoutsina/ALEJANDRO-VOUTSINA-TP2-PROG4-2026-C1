@@ -5,7 +5,8 @@
   padding: 20px 40px;
 }
 .margen {
-  margin-left: 235px;
+  margin: 20px 30px 0 260px;
+  padding-right: 20px;
 }
 .boton-crear {
   transition: transform 0.2s;
@@ -287,7 +288,9 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   color: #fff;
 }
-
+.perfil-titulo {
+  color: #fff !important;
+}
 .info-perfil {
   color: #fff;
 }

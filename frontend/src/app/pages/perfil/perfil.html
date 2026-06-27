@@ -28,15 +28,13 @@
           }}
         </h2>
 
-        @if (!this.seleccionoUsuario()) {
+        @if (this.usuario()?.nombre) {
+          <p class="m-0"><strong>Nombre:</strong> {{ this.usuario()?.nombre }}</p>
+        } @else {
           <p class="m-0"><strong>Nombre:</strong> {{ this.getNombreUsuario }}</p>
         }
 
-        @if (this.seleccionoUsuario() && this.usuario()?.nombre) {
-          <p class="m-0"><strong>Nombre:</strong> {{ this.usuario()?.nombre }}</p>
-        }
-
-        @if (this.seleccionoUsuario() && this.usuario()?.apellido) {
+        @if (this.usuario()?.apellido) {
           <p class="m-0"><strong>Apellido:</strong> {{ this.usuario()?.apellido }}</p>
         }
 
@@ -67,7 +65,7 @@
       <!-- Botón editar solo si es tu propio perfil -->
       @if (!this.seleccionoUsuario()) {
         <div class="ms-auto">
-          <h5 class="text-muted m-0">TU PERFIL</h5>
+          <h5 class="perfil-titulo m-0">TU PERFIL</h5>
         </div>
       }
     </div>
