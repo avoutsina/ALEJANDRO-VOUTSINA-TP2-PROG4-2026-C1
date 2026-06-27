@@ -3,12 +3,23 @@
   color: red;
 }
 .titulo {
-  margin-left: 250px;
+  margin-left: 0;
+}
+.page-header-publicacion {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 .containerPubli {
-  margin-left: 250px;
-  width: 57%;
-  height: 450px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  min-height: 450px;
   border: 2px solid rgb(77, 77, 77);
   border-radius: 10px;
 }
