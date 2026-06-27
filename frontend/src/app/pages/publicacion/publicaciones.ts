@@ -39,35 +39,27 @@ export class Publicacion {
   crearPublicacion() {
     if (!this.fomularioPublicacion.valid) return;
 
-    const userId = this.authService.getSub as string;
     const descripcion = this.fomularioPublicacion.controls.descripcion.value as string;
     const titulo = this.fomularioPublicacion.controls.titulo.value as string;
-    const nombreUsuario = this.authService.getNombreUsuario as string;
-    const avatar = this.authService.getAvatar as string;
 
-    this.userService
-      .crearPublicacion(
-        { titulo, userId, descripcion, nombreUsuario, avatar },
-        this.archivoSeleccionado,
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-        },
-        error: (error) => {
-          const err = error.error?.message ?? 'Error al publicar';
-          Swal.fire({ title: err, icon: 'error', draggable: true });
-        },
-        complete: () => {
-          Swal.fire({ title: 'Publicado con exito', icon: 'success', draggable: true }).then(
-            (result) => {
-              if (result.isDismissed || result.isConfirmed) {
-                this.router.navigateByUrl('/inicio');
-              }
-            },
-          );
-        },
-      });
+    this.userService.crearPublicacion({ titulo, descripcion }, this.archivoSeleccionado).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (error) => {
+        const err = error.error?.message ?? 'Error al publicar';
+        Swal.fire({ title: err, icon: 'error', draggable: true });
+      },
+      complete: () => {
+        Swal.fire({ title: 'Publicado con exito', icon: 'success', draggable: true }).then(
+          (result) => {
+            if (result.isDismissed || result.isConfirmed) {
+              this.router.navigateByUrl('/inicio');
+            }
+          },
+        );
+      },
+    });
   }
 
   nuevaPublicacion() {
