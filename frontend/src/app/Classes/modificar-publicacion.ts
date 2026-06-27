@@ -12,51 +12,28 @@ export class ModificarPublicacion
 
     likearPublicacion(publicacion: Partial<PublicacionM>, publicacionesSignal: WritableSignal<PublicacionM[]>)
     {
-        if(!publicacion.meGustaId)
-        {
-            publicacion.meGustaId = [];
-        }
-
-        let meGustaTotal = publicacion.meGusta?? 0;
+        if(!publicacion._id) return;
+        if(!publicacion.meGustaId) publicacion.meGustaId = [];
 
         const userId = this.authService.getSub;
         if(!userId) return;
 
-        const indexEncontrado = publicacion.meGustaId.indexOf(userId);
-        const yaDioLike = indexEncontrado !== -1;
+        const yaDioLike = publicacion.meGustaId.includes(userId);
+
+        const actualizarSignal = (pubActualizada: PublicacionM) => {
+            publicacionesSignal.update(lista =>
+                lista.map(p => p._id === pubActualizada._id ? { ...p, meGusta: pubActualizada.meGusta, meGustaId: pubActualizada.meGustaId } : p)
+            );
+        };
 
         if (!yaDioLike)
         {
-            meGustaTotal++;
-            publicacion.meGustaId.push(userId);
+            this.publicacionService.darLike(publicacion._id).subscribe({ next: actualizarSignal });
         }
         else
         {
-            if(meGustaTotal > 0)
-            {
-                meGustaTotal--;
-            }
-            publicacion.meGustaId?.splice(indexEncontrado, 1);
+            this.publicacionService.quitarLike(publicacion._id).subscribe({ next: actualizarSignal });
         }
-
-        if(!publicacion._id) return;
-        
-        this.publicacionService.modificarPublicacion(publicacion._id, { meGusta: meGustaTotal, meGustaId: publicacion.meGustaId}).subscribe(res => 
-        {
-            console.log(res);
-        });
-        publicacionesSignal.update(lista =>
-        {
-            for (const publicacionSignal of lista)
-                {
-                    if (publicacionSignal._id === publicacion._id)
-                        {
-                            publicacion.meGusta = meGustaTotal;
-                            break;
-                        }
-                    }
-                    return lista;
-        });
     }
 
     enviarComentario(comentario: string, usuario: UsuarioC, publicacion: Partial<PublicacionM>)

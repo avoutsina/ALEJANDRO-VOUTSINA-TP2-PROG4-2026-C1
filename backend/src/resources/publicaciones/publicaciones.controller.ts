@@ -1,31 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacioneDto } from './dto/create-publicaciones.dto';
 import { UpdatePublicacioneDto } from './dto/update-publicaciones.dto';
 import { AuthGuard } from '../../guards/auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 
 @UseGuards(AuthGuard)
 @Controller()
 export class PublicacionesController
 {
-  constructor(private readonly publicacionesService: PublicacionesService) {}
+  constructor(
+    private readonly publicacionesService: PublicacionesService,
+    private readonly cloudinaryService: CloudinaryService
+  ) {}
   
   @Post("perfil/crear")
-  create(@Body() createPublicacioneDto: CreatePublicacioneDto)
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  async create(
+    @Body() createPublicacioneDto: CreatePublicacioneDto,
+    @UploadedFile() file?: Express.Multer.File
+  )
   {
+    if (file) {
+      const uploadResult = await this.cloudinaryService.uploadImage(file, 'publicaciones');
+      if (uploadResult?.secure_url) {
+        createPublicacioneDto.urlImg = uploadResult.secure_url;
+      }
+    }
     return this.publicacionesService.create(createPublicacioneDto);
   }
 
   @Get("inicio")
-  findAll(@Query("sort") sort?: string)
+  findAll(
+    @Query("sort") sort?: string,
+    @Query("userId") userId?: string,
+    @Query("offset") offset?: string,
+    @Query("limit") limit?: string
+  )
   {
-    return this.publicacionesService.findAll(sort);
+    const off = offset !== undefined ? Number(offset) : undefined;
+    const lim = limit !== undefined ? Number(limit) : undefined;
+    return this.publicacionesService.findAll(sort, userId, off, lim);
   }
+
   @Get("publicaciones/:id")
   countByUserAndDate(@Param("id") id: string, @Query("desde") desde?: string, @Query("hasta") hasta?: string) 
   {
     return this.publicacionesService.findAllMeCount(id, desde, hasta);
   }
+
   @Get("perfil/:id")
   findAllMe(@Param("id") userId: string, @Query("pagina") pagina: number)
   {
@@ -37,6 +62,7 @@ export class PublicacionesController
   {
     return this.publicacionesService.findComments(publicacionId, pagina);
   }
+
   @Get("comentarios/usuarios/:id")
   findAllComments(@Param('id') userId: string, @Query("desde") desde: string, @Query("hasta") hasta: string)
   {
@@ -50,8 +76,16 @@ export class PublicacionesController
   }
 
   @Delete("perfil/eliminar/:id")
-  remove(@Param('id') id: string)
+  async remove(@Param('id') id: string, @Req() req: any)
   {
+    const userId = req.user?.sub;
+    const isAdmin = req.user?.admin;
+
+    const publicacion = await this.publicacionesService.findOne(id);
+    if (publicacion.userId !== userId && !isAdmin) {
+      throw new ForbiddenException("No tienes permisos para eliminar esta publicación");
+    }
+
     return this.publicacionesService.remove(id);
   }
 
@@ -59,5 +93,19 @@ export class PublicacionesController
   removeAll(@Param('userId') userId: string)
   {
     return this.publicacionesService.removeAll(userId);
+  }
+
+  @Post("publicaciones/:id/like")
+  like(@Param('id') id: string, @Req() req: any)
+  {
+    const userId = req.user?.sub;
+    return this.publicacionesService.likePublicacion(id, userId);
+  }
+
+  @Delete("publicaciones/:id/like")
+  unlike(@Param('id') id: string, @Req() req: any)
+  {
+    const userId = req.user?.sub;
+    return this.publicacionesService.unlikePublicacion(id, userId);
   }
 }

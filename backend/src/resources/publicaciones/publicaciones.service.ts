@@ -150,28 +150,45 @@ export class PublicacionesService
     }
   }
 
-  async findAll(sort?: string)
+  async findAll(sort?: string, userId?: string, offset?: number, limit?: number)
   {
     try
     {
-      let publicaciones = this.publicacionModel.find();
-      switch(sort)
-      {
-        case "fecha":
-          publicaciones = publicaciones.sort({created_at: -1});
-          break;
-        case "masLikes":
-          publicaciones = publicaciones.sort({meGusta: -1});
-          break;
-        case "menosLikes":
-          publicaciones = publicaciones.sort({meGusta: 1});
-          break;
+      const filter: any = { eliminado: { $ne: true } };
+      if (userId) {
+        filter.userId = userId;
       }
-      return publicaciones;
+      
+      let query = this.publicacionModel.find(filter);
+      
+      if (sort === "likes" || sort === "masLikes")
+      {
+        query = query.sort({ meGusta: -1 });
+      }
+      else if (sort === "menosLikes")
+      {
+        query = query.sort({ meGusta: 1 });
+      }
+      else
+      {
+        query = query.sort({ created_at: -1 });
+      }
+
+      if (offset !== undefined && offset !== null)
+      {
+        query = query.skip(Number(offset));
+      }
+      if (limit !== undefined && limit !== null)
+      {
+        query = query.limit(Number(limit));
+      }
+      
+      return await query.exec();
     }
-    catch
+    catch (error)
     {
-      throw new HttpException("Error al traer las publicaciones",HttpStatus.NOT_FOUND);
+      console.error(error);
+      throw new HttpException("Error al traer las publicaciones", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -179,7 +196,11 @@ export class PublicacionesService
   {
     try
     {
-      const publicacionActualizada = await this.publicacionModel.findByIdAndUpdate(id, updatePublicacioneDto, { new: true });
+      const publicacionActualizada = await this.publicacionModel.findOneAndUpdate(
+        { _id: id, eliminado: { $ne: true } },
+        updatePublicacioneDto,
+        { new: true }
+      );
       if (!publicacionActualizada)
       {
         throw new NotFoundException("La publicación no existe");
@@ -194,30 +215,42 @@ export class PublicacionesService
     }
   }
 
-  async findOne(id: number)
+  async findOne(id: string)
   {
     try
     {
-      const porId = await this.publicacionModel.findById(id);
+      const porId = await this.publicacionModel.findOne({ _id: id, eliminado: { $ne: true } });
+      if (!porId) {
+        throw new NotFoundException("La publicación no existe");
+      }
       return porId;
     }
-    catch
+    catch (error)
     {
-      throw new HttpException("No se encontro la publicacion",HttpStatus.NOT_FOUND);
+      if (error instanceof NotFoundException) throw error;
+      throw new HttpException("No se encontro la publicacion", HttpStatus.NOT_FOUND);
     }
   }
-
 
   async remove(id: string)
   {
     try
     {
-      const porId = await this.publicacionModel.deleteOne({_id: id});
-      return porId;
+      const publicacion = await this.publicacionModel.findByIdAndUpdate(
+        id,
+        { eliminado: true },
+        { new: true }
+      ).exec();
+      if (!publicacion)
+      {
+        throw new NotFoundException("La publicación no existe o ya fue eliminada");
+      }
+      return publicacion;
     }
-    catch
+    catch (error)
     {
-      throw new HttpException("No se encontro la publicacion",HttpStatus.NOT_FOUND);
+      if (error instanceof NotFoundException) throw error;
+      throw new HttpException("No se pudo eliminar la publicación", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -225,12 +258,43 @@ export class PublicacionesService
   {
     try
     {
-      const porId = await this.publicacionModel.deleteOne({userId: userId});
-      return porId;
+      const resultado = await this.publicacionModel.updateMany(
+        { userId: userId },
+        { eliminado: true }
+      ).exec();
+      return resultado;
     }
     catch
     {
-      throw new HttpException("No se encontro la publicacion",HttpStatus.NOT_FOUND);
+      throw new HttpException("No se pudo eliminar las publicaciones del usuario", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async likePublicacion(id: string, userId: string) {
+    const publicacion = await this.publicacionModel.findOne({ _id: id, eliminado: { $ne: true } }).exec();
+    if (!publicacion) {
+      throw new NotFoundException("La publicación no existe");
+    }
+    if (publicacion.meGustaId.includes(userId)) {
+      throw new BadRequestException("Ya diste me gusta a esta publicación");
+    }
+    
+    publicacion.meGustaId.push(userId);
+    publicacion.meGusta = publicacion.meGustaId.length;
+    return await publicacion.save();
+  }
+
+  async unlikePublicacion(id: string, userId: string) {
+    const publicacion = await this.publicacionModel.findOne({ _id: id, eliminado: { $ne: true } }).exec();
+    if (!publicacion) {
+      throw new NotFoundException("La publicación no existe");
+    }
+    if (!publicacion.meGustaId.includes(userId)) {
+      throw new BadRequestException("No has dado me gusta a esta publicación");
+    }
+    
+    publicacion.meGustaId = publicacion.meGustaId.filter(uid => uid !== userId);
+    publicacion.meGusta = publicacion.meGustaId.length;
+    return await publicacion.save();
   }
 }
