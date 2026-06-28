@@ -35,12 +35,11 @@ export class PublicacionesService {
       );
     }
   }
-
   async findAllMe(userId: string, pagina: number) {
     try {
       const skip = (pagina - 1) * 3;
       const porId = await this.publicacionModel
-        .find({ userId: userId })
+        .find({ userId: userId, eliminado: { $ne: true } })
         .sort({ created_at: -1 })
         .skip(skip)
         .limit(3);
@@ -54,8 +53,7 @@ export class PublicacionesService {
   }
 
   async findAllMeCount(userId: string, desde?: string, hasta?: string) {
-    const match: any = { userId };
-
+    const match: any = { userId, eliminado: { $ne: true } };
     if (desde || hasta) {
       match.created_at = {};
 
