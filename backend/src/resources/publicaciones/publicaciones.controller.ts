@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -33,14 +34,25 @@ export class PublicacionesController {
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   async create(
     @Req() req: any,
-    @Body() createPublicacioneDto: CreatePublicacioneDto,
+    @Body() body: any,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const user = req.user || {};
-    createPublicacioneDto.userId = user.sub;
-    createPublicacioneDto.nombreUsuario = user.userName;
-    createPublicacioneDto.avatar = user.avatar ?? '';
-    createPublicacioneDto.descripcion = createPublicacioneDto.descripcion ?? '';
+    if (!user.sub || !user.userName) {
+      throw new BadRequestException('Token inválido o incompleto');
+    }
+
+    const publicacion: CreatePublicacioneDto = {
+      titulo: body.titulo,
+      userId: user.sub,
+      urlImg: '',
+      descripcion: body.descripcion ?? '',
+      nombreUsuario: user.userName,
+      avatar: user.avatar ?? '',
+      meGusta: 0,
+      meGustaId: [],
+      comentarios: [],
+    };
 
     if (file) {
       const uploadResult = await this.cloudinaryService.uploadImage(
@@ -48,10 +60,11 @@ export class PublicacionesController {
         'publicaciones',
       );
       if (uploadResult?.secure_url) {
-        createPublicacioneDto.urlImg = uploadResult.secure_url;
+        publicacion.urlImg = uploadResult.secure_url;
       }
     }
-    return this.publicacionesService.create(createPublicacioneDto);
+
+    return this.publicacionesService.create(publicacion);
   }
 
   @Get('inicio')
