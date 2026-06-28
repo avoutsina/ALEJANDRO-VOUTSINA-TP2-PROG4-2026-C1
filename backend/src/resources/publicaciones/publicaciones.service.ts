@@ -249,7 +249,14 @@ export class PublicacionesService {
       // Attempt to delete image from Cloudinary if publicId is present
       try {
         if (publicacion.publicId) {
-          await this.cloudinaryService.deleteImage(publicacion.publicId);
+          const result = await this.cloudinaryService.deleteImage(
+            publicacion.publicId,
+          );
+          console.log(
+            'Cloudinary delete result for',
+            publicacion.publicId,
+            result,
+          );
         }
       } catch (err) {
         console.error('Error deleting image from Cloudinary:', err);

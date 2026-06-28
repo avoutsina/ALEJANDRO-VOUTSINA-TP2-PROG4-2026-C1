@@ -63,10 +63,11 @@ export class CloudinaryService {
 
   async deleteImage(publicId: string): Promise<any> {
     if (!publicId) return null;
+    const id = this.extractPublicId(publicId);
     return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(
-        publicId,
-        { resource_type: 'image' },
+      cloudinary.api.delete_resources(
+        [id],
+        { resource_type: 'image', invalidate: true },
         (error, result) => {
           if (error) return reject(error);
           resolve(result);
@@ -77,15 +78,39 @@ export class CloudinaryService {
 
   async deleteResources(publicIds: string[]): Promise<any> {
     if (!publicIds || publicIds.length === 0) return null;
+    const ids = publicIds.map((p) => this.extractPublicId(p));
     return new Promise((resolve, reject) => {
       cloudinary.api.delete_resources(
-        publicIds,
-        { resource_type: 'image' },
+        ids,
+        { resource_type: 'image', invalidate: true },
         (error, result) => {
           if (error) return reject(error);
           resolve(result);
         },
       );
     });
+  }
+
+  private extractPublicId(input: string): string {
+    if (!input) return input;
+    try {
+      if (input.startsWith('http')) {
+        const uploadIndex = input.indexOf('/upload/');
+        if (uploadIndex >= 0) {
+          let path = input.substring(uploadIndex + '/upload/'.length);
+          path = path.replace(/v\d+\//, '');
+          const lastDot = path.lastIndexOf('.');
+          if (lastDot > -1) path = path.substring(0, lastDot);
+          return path;
+        }
+        const seg = input.split('/').pop() || input;
+        const parts = seg.split('.');
+        if (parts.length > 1) parts.pop();
+        return parts.join('.');
+      }
+      return input;
+    } catch (e) {
+      return input;
+    }
   }
 }
