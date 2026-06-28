@@ -8,7 +8,7 @@ import { PublicacionM, Comentario } from '../../interfaces/publicacion';
 import { Loading } from '../components/loading/loading';
 import Swal from 'sweetalert2';
 
-const COMENTARIOS_POR_PAGINA = 6;
+const COMENTARIOS_POR_PAGINA = 3;
 
 @Component({
   selector: 'app-detalle',

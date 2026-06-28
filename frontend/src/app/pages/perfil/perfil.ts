@@ -169,7 +169,7 @@ export class Perfil {
     this.publicacionesService.traerComentarios(publicacionId, this.paginaActualComentarios).subscribe({
       next: (res) => {
         const lista = res.comentarios;
-        if (lista.length < 6) {
+        if (lista.length < 3) {
           this.hayMasComentarios.set(false);
         }
         if (this.paginaActualComentarios === 1) {

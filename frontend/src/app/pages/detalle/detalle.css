@@ -97,12 +97,16 @@
   flex-direction: column;
 }
 
-.container-comentarios-custom {
+.container-comentarios-custom.con-scroll {
   max-height: 250px;
   overflow-y: auto;
   overflow-x: hidden;
   border-radius: 8px;
   scrollbar-width: none;
+}
+.container-comentarios-custom.sin-scroll {
+  max-height: none;
+  overflow: visible;
 }
 
 .container-comentarios-custom::-webkit-scrollbar {

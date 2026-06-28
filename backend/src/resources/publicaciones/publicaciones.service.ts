@@ -88,7 +88,7 @@ export class PublicacionesService {
 
   async findComments(id: string, pagina: number) {
     const paginaNumero = Number(pagina) || 1;
-    const limit = 6;
+    const limit = 3;
     const skip = (paginaNumero - 1) * limit;
 
     let objectId: Types.ObjectId;

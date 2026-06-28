@@ -129,7 +129,7 @@ export class PublicacionItemComponent {
       .subscribe({
         next: (res) => {
           const lista = res.comentarios;
-          if (lista.length < 6) this.hayMasComentarios.set(false);
+          if (lista.length < 3) this.hayMasComentarios.set(false);
           if (this.paginaActualComentarios === 1) {
             this.comentarios.set(lista);
           } else {

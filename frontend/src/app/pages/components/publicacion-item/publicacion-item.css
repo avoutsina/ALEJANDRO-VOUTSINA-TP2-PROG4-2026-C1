@@ -180,11 +180,16 @@
 
 .container-comentarios
 {
+    margin-bottom: 15px;
+}
+.container-comentarios.con-scroll {
     max-height: 250px;
     overflow-y: auto;
-    border-radius: 8px;
     scrollbar-width: none;
-    margin-bottom: 15px;
+}
+.container-comentarios.sin-scroll {
+    max-height: none;
+    overflow: visible;
 }
 .container-comentarios::-webkit-scrollbar
 {

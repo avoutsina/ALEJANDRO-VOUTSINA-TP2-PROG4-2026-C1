@@ -86,7 +86,7 @@
 
         @if(mostrarComentarios())
         {
-            <div class="container-comentarios">
+            <div class="container-comentarios" [class.con-scroll]="paginaActualComentarios > 1" [class.sin-scroll]="paginaActualComentarios === 1">
                 @for (comentario of this.comentarios(); track $index)
                 {
                     <div class="d-flex align-items-center gap-2 mb-3 container-comentario">

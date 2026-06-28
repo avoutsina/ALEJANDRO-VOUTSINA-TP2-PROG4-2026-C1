@@ -80,7 +80,7 @@
         <h5 class="mb-3 text-white">Comentarios</h5>
 
         <!-- Lista de comentarios -->
-        <div class="container-comentarios-custom mb-3">
+        <div class="container-comentarios-custom mb-3" [class.con-scroll]="paginaActual > 1" [class.sin-scroll]="paginaActual === 1">
           @for (comentario of comentarios(); track comentario._id) {
             <div class="d-flex align-items-center gap-2 mb-3 container-comentario">
               <div class="view usuario-comentario">
