@@ -188,7 +188,7 @@ export class Auth {
       this.sesionTimerId = null;
     }
 
-    const DIEZ_MINUTOS = 10 * 1000;
+    const DIEZ_MINUTOS = 10 * 60 * 1000;
 
     this.sesionTimerId = setTimeout(() => {
       Swal.fire({
