@@ -60,4 +60,32 @@ export class CloudinaryService {
       reject(new Error('No file content available for upload.'));
     });
   }
+
+  async deleteImage(publicId: string): Promise<any> {
+    if (!publicId) return null;
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.destroy(
+        publicId,
+        { resource_type: 'image' },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        },
+      );
+    });
+  }
+
+  async deleteResources(publicIds: string[]): Promise<any> {
+    if (!publicIds || publicIds.length === 0) return null;
+    return new Promise((resolve, reject) => {
+      cloudinary.api.delete_resources(
+        publicIds,
+        { resource_type: 'image' },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        },
+      );
+    });
+  }
 }

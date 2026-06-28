@@ -17,6 +17,10 @@ export class CreatePublicacioneDto {
 
   @IsString()
   @IsOptional()
+  publicId?: string;
+
+  @IsString()
+  @IsOptional()
   descripcion?: string;
 
   @IsString()

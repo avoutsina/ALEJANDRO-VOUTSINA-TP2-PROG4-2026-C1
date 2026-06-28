@@ -1,44 +1,46 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { ObjectId } from "mongoose";
-import { Comentario, ComentarioSchema } from "./comentario";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ObjectId } from 'mongoose';
+import { Comentario, ComentarioSchema } from './comentario';
 
 @Schema()
-export class Publicaciones
-{
-    _id!: ObjectId
+export class Publicaciones {
+  _id!: ObjectId;
 
-    @Prop({ required: true })
-    titulo!: string;
+  @Prop({ required: true })
+  titulo!: string;
 
-    @Prop({ required: true})
-    userId!: string;
+  @Prop({ required: true })
+  userId!: string;
 
-    @Prop({ required: false, default: "" })
-    urlImg!: string;
+  @Prop({ required: false, default: '' })
+  urlImg!: string;
 
-    @Prop({ default: "" })
-    descripcion!: string;
+  @Prop({ required: false, default: '' })
+  publicId!: string;
 
-    @Prop({ required: true })
-    nombreUsuario!: string;
+  @Prop({ default: '' })
+  descripcion!: string;
 
-    @Prop({ default: "" })
-    avatar!: string;
+  @Prop({ required: true })
+  nombreUsuario!: string;
 
-    @Prop({ default: 0 })
-    meGusta!: number;
+  @Prop({ default: '' })
+  avatar!: string;
 
-    @Prop({ default: [] })
-    meGustaId!: string[];
+  @Prop({ default: 0 })
+  meGusta!: number;
 
-    @Prop({ type: [ComentarioSchema], default: [] })
-    comentarios!: Comentario[];
+  @Prop({ default: [] })
+  meGustaId!: string[];
 
-    @Prop({ default: false })
-    eliminado!: boolean;
+  @Prop({ type: [ComentarioSchema], default: [] })
+  comentarios!: Comentario[];
 
-    @Prop({ default: Date.now })
-    created_at!: Date;
+  @Prop({ default: false })
+  eliminado!: boolean;
+
+  @Prop({ default: Date.now })
+  created_at!: Date;
 }
 
 export const PublicacionesEschema = SchemaFactory.createForClass(Publicaciones);

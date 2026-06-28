@@ -11,12 +11,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Publicaciones } from './entities/publicaciones.entity';
 import { Model } from 'mongoose';
 import { link } from 'fs';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 
 @Injectable()
 export class PublicacionesService {
   constructor(
     @InjectModel(Publicaciones.name)
     private publicacionModel: Model<Publicaciones>,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async create(createPublicacioneDto: CreatePublicacioneDto) {
@@ -237,14 +239,24 @@ export class PublicacionesService {
 
   async remove(id: string) {
     try {
-      const publicacion = await this.publicacionModel
-        .findByIdAndDelete(id)
-        .exec();
+      const publicacion = await this.publicacionModel.findById(id).exec();
       if (!publicacion) {
         throw new NotFoundException(
           'La publicación no existe o ya fue eliminada',
         );
       }
+
+      // Attempt to delete image from Cloudinary if publicId is present
+      try {
+        if (publicacion.publicId) {
+          await this.cloudinaryService.deleteImage(publicacion.publicId);
+        }
+      } catch (err) {
+        console.error('Error deleting image from Cloudinary:', err);
+        // proceed to delete DB record even if Cloudinary deletion fails
+      }
+
+      await this.publicacionModel.findByIdAndDelete(id).exec();
       return publicacion;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
@@ -257,11 +269,26 @@ export class PublicacionesService {
 
   async removeAll(userId: string) {
     try {
+      const publicaciones = await this.publicacionModel.find({ userId }).exec();
+      const publicIds = publicaciones
+        .map((p) => p.publicId)
+        .filter((id) => id && id.length > 0);
+
+      try {
+        if (publicIds.length > 0) {
+          await this.cloudinaryService.deleteResources(publicIds);
+        }
+      } catch (err) {
+        console.error('Error deleting resources from Cloudinary:', err);
+        // continue to delete DB records even if Cloudinary deletion fails
+      }
+
       const resultado = await this.publicacionModel
-        .deleteMany({ userId: userId })
+        .deleteMany({ userId })
         .exec();
       return resultado;
-    } catch {
+    } catch (err) {
+      console.error(err);
       throw new HttpException(
         'No se pudo eliminar las publicaciones del usuario',
         HttpStatus.INTERNAL_SERVER_ERROR,

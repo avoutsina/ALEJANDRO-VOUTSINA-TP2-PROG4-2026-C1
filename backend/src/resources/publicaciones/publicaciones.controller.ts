@@ -61,6 +61,7 @@ export class PublicacionesController {
       );
       if (uploadResult?.secure_url) {
         publicacion.urlImg = uploadResult.secure_url;
+        publicacion.publicId = uploadResult.public_id;
       }
     }
 
