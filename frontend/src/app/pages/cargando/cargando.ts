@@ -37,6 +37,7 @@ export class CargandoPage implements OnInit
       {
         // Token válido → ir a inicio
         this.authService.estado.set(true);
+        this.authService.iniciarContadorSesion();
         this.router.navigateByUrl('/inicio');
       },
       error: () =>
