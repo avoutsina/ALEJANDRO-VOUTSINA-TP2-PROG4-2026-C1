@@ -1,137 +1,164 @@
-<div class="detalle-page">
+<div class="detalle-page d-flex flex-column align-items-center">
   @if (cargando()) {
     <div class="loading-center">
       <app-loading></app-loading>
     </div>
   } @else if (publicacion()) {
-    <div class="detalle-layout">
-
+    <div class="detalle-layout mb-5 d-grid justify-content-center cards p-3">
       <!-- Botón volver -->
-      <button class="btn-volver" routerLink="/inicio">
-        <span>&#8592;</span> Volver
-      </button>
+      <div class="d-flex align-items-center justify-content-between mt-1 mb-3 width-100">
+        <button class="btn btn-sm btn-secondary" routerLink="/inicio">
+          <span>&#8592;</span> Volver
+        </button>
+      </div>
 
       <!-- Card publicación -->
-      <div class="pub-card">
+      <div class="pub-card-custom">
         <!-- Header -->
-        <div class="pub-header">
-          <div class="pub-autor" [routerLink]="['/perfil', publicacion()!.userId]">
+        <div class="d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div class="d-flex align-items-center gap-3">
             @if (publicacion()!.avatar) {
-              <img [src]="publicacion()!.avatar" alt="avatar" class="avatar-img" />
+              <div class="mb-2 view cursor-pointer" [routerLink]="['/perfil', publicacion()!.userId]">
+                <img [src]="publicacion()!.avatar" alt="avatar" />
+              </div>
             } @else {
-              <img src="/assets/User.svg" alt="avatar" class="avatar-img avatar-default" />
+              <div class="mb-2 cursor-pointer" [routerLink]="['/perfil', publicacion()!.userId]">
+                <img src="/assets/User.svg" alt="avatar" width="55px" />
+              </div>
             }
-            <div>
-              <span class="autor-nombre">{{ publicacion()!.nombreUsuario | titlecase }}</span>
-              <span class="pub-fecha">{{ publicacion()!.created_at | date:'dd MMM yyyy, h:mm a' }}</span>
-            </div>
-          </div>
-          <div class="pub-stats">
-            <span class="stat-badge">❤️ {{ publicacion()!.meGusta }}</span>
-            <span class="stat-badge">💬 {{ totalComentarios }}</span>
+            <h4 class="cursor-pointer m-0" [routerLink]="['/perfil', publicacion()!.userId]">
+              {{ publicacion()!.nombreUsuario | titlecase }}
+            </h4>
           </div>
         </div>
 
         <!-- Título -->
-        <h1 class="pub-titulo">{{ publicacion()!.titulo }}</h1>
+        @if (publicacion()!.titulo) {
+          <h5 class="mb-2 px-1 text-white">{{ publicacion()!.titulo }}</h5>
+        }
 
         <!-- Imagen grande -->
         @if (publicacion()!.urlImg) {
-          <div class="pub-imagen-container">
-            <img [src]="publicacion()!.urlImg" alt="imagen publicación" class="pub-imagen" />
+          <div class="container-foto-custom mb-3">
+            <img [src]="publicacion()!.urlImg" alt="foto" class="w-100 rounded-4">
           </div>
         }
 
+        <!-- Stats (Likes e Icono comentarios como en inicio) -->
+        <div class="d-flex justify-content-between align-items-center container-stats border-bottom border-secondary pb-3 mb-3">
+          <div class="d-flex justify-content-center align-items-center">
+            @if(publicacion()!.meGustaId.includes(getSub)) {
+              <div>
+                <img src="/assets/Like-Rojo.svg" alt="likeRojo" class="icono">
+              </div>
+            } @else {
+              <div>
+                <img src="/assets/Like.svg" alt="like" class="icono">
+              </div>
+            }
+            <p class="m-0 text-white ms-1">{{publicacion()!.meGusta}}</p>
+          </div>
+
+          <div class="d-flex justify-content-center align-items-center">
+            <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3">
+            <p class="m-0 text-white ms-1">{{totalComentarios}}</p>
+          </div>
+
+          <p class="m-0 text-white-50">{{publicacion()!.created_at | date:'dd-MM-yyyy' }}</p>
+        </div>
+
         <!-- Descripción -->
         @if (publicacion()!.descripcion) {
-          <p class="pub-descripcion">{{ publicacion()!.descripcion }}</p>
+          <div class="descripcion text-center mb-4 mt-2">
+            <p class="m-0 text-white">{{ publicacion()!.descripcion }}</p>
+          </div>
         }
       </div>
 
       <!-- Sección comentarios -->
-      <div class="comentarios-section">
-        <h2 class="comentarios-titulo">Comentarios <span class="badge-total">{{ totalComentarios }}</span></h2>
-
-        <!-- Input escribir / editar comentario -->
-        <div class="input-comentario">
-          @if (getAvatar) {
-            <img [src]="getAvatar" alt="mi avatar" class="avatar-small" />
-          } @else {
-            <img src="/assets/User.svg" alt="avatar" class="avatar-small" />
-          }
-          <div class="input-wrapper">
-            <input
-              id="input-nuevo-comentario"
-              type="text"
-              class="comentario-input"
-              [placeholder]="editando() ? 'Editando comentario...' : 'Escribe un comentario...'"
-              [(ngModel)]="nuevoComentario"
-              (keydown.enter)="editando() ? guardarEdicion() : enviarComentario()"
-            />
-            <div class="input-acciones">
-              @if (editando()) {
-                <button class="btn-accion btn-cancelar" (click)="cancelarEdicion()" title="Cancelar">✕</button>
-                <button class="btn-accion btn-guardar" (click)="guardarEdicion()" title="Guardar">✓</button>
-              } @else {
-                <button class="btn-accion btn-enviar" (click)="enviarComentario()" title="Enviar">➤</button>
-              }
-            </div>
-          </div>
-        </div>
-
-        @if (editando()) {
-          <p class="editando-aviso">✏️ Editando tu comentario — presioná ✓ para guardar o ✕ para cancelar</p>
-        }
+      <div class="comentarios-section-custom mt-3">
+        <h5 class="mb-3 text-white">Comentarios</h5>
 
         <!-- Lista de comentarios -->
-        <div class="comentarios-lista">
+        <div class="container-comentarios-custom mb-3">
           @for (comentario of comentarios(); track comentario._id) {
-            <div class="comentario-item">
-              <div class="comentario-avatar">
+            <div class="d-flex align-items-center gap-2 mb-3 container-comentario">
+              <div class="view usuario-comentario">
                 @if (comentario.usuario.avatar) {
-                  <img [src]="comentario.usuario.avatar" alt="avatar" class="avatar-small" />
+                  <img [src]="comentario.usuario.avatar" alt="miAvatar">
                 } @else {
-                  <img src="/assets/User.svg" alt="avatar" class="avatar-small" />
+                  <img src="/assets/User.svg" alt="avatar" width="55px">
                 }
               </div>
-              <div class="comentario-body">
-                <div class="comentario-meta">
-                  <span class="comentario-autor">{{ comentario.usuario.nombreUsuario }}</span>
-                  @if (comentario.created_at) {
-                    <span class="comentario-fecha">{{ comentario.created_at | date:'dd/MM/yyyy' }}</span>
-                  }
-                  @if (comentario.modificado) {
-                    <span class="badge-editado">editado</span>
-                  }
+              <div class="box-comment d-flex align-items-center">
+                <div class="d-flex flex-column">
+                  <div class="d-flex align-items-center gap-2">
+                    <small class="text-info">{{comentario.usuario.nombreUsuario}}</small>
+                    @if(comentario.modificado) {
+                      <span class="badge-editado">editado</span>
+                    }
+                  </div>
+                  <p class="m-0 descripcion text-white">{{comentario.texto}}</p>
                 </div>
-                <p class="comentario-texto">{{ comentario.texto }}</p>
+                @if (comentario.usuario.userId === getSub) {
+                  <div class="container-edits align-items-center ms-2" style="display: inline-flex;">
+                    <div (click)="iniciarEdicion(comentario)">
+                      <img src="/assets/Editar.svg" alt="editar" style="cursor: pointer; width: 21px;">
+                    </div>
+                  </div>
+                }
               </div>
-              @if (comentario.usuario.userId === getSub) {
-                <button class="btn-editar-comentario" (click)="iniciarEdicion(comentario)" title="Editar">
-                  <img src="/assets/Editar.svg" alt="editar" width="18px" />
-                </button>
-              }
             </div>
           }
 
           @if (comentarios().length === 0 && !cargandoComentarios()) {
-            <p class="sin-comentarios">Sé el primero en comentar 👇</p>
+            <p class="text-white-50 text-center py-2">Sé el primero en comentar 👇</p>
           }
         </div>
 
-        <!-- Cargar más -->
+        <!-- Cargar más comentarios -->
         @if (hayMasComentarios() && !cargandoComentarios()) {
-          <div class="cargar-mas-container">
-            <button class="btn-cargar-mas" (click)="cargarMasComentarios()">Cargar más comentarios</button>
+          <div class="d-flex align-items-center justify-content-center mb-3">
+            <button class="btn btn-secondary rounded-4 btn-sm" (click)="cargarMasComentarios()">Cargar Más</button>
           </div>
         }
         @if (cargandoComentarios()) {
-          <div class="loading-center mt-3">
+          <div class="d-flex justify-content-center mb-3">
             <app-loading></app-loading>
           </div>
         }
-      </div>
 
+        <!-- Escribir / Editar comentario (Input como en inicio) -->
+        <div class="d-flex align-items-center gap-2 mt-2 pt-2 border-top border-secondary">
+          <div class="view imagen-comentario">
+            @if (getAvatar) {
+              <img [src]="getAvatar" alt="miAvatar">
+            } @else {
+              <img src="/assets/User.svg" alt="avatar" width="55px">
+            }
+          </div>
+          <div class="container-input" style="width: 70%;">
+            <input
+              type="text"
+              id="input-nuevo-comentario"
+              [placeholder]="editando() ? 'Modificar comentario...' : 'Agregar un comentario'"
+              class="form-control form-control-sm input-coment"
+              [(ngModel)]="nuevoComentario"
+              (keydown.enter)="editando() ? guardarEdicion() : enviarComentario()"
+            />
+          </div>
+
+          <div class="d-flex justify-content-center align-items-center mb-1 gap-2">
+            @if (editando()) {
+              <img src="/assets/Cruz.svg" alt="Cancelar" class="icono" width="30px" (click)="cancelarEdicion()">
+              <img src="/assets/Send.svg" alt="Guardar" class="icono" width="30px" (click)="guardarEdicion()">
+            } @else {
+              <img src="/assets/Send.svg" alt="Enviar" class="icono" width="30px" (click)="enviarComentario()">
+            }
+          </div>
+        </div>
+      </div>
     </div>
   }
 </div>
+
