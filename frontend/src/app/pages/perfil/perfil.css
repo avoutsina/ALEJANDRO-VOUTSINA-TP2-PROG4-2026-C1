@@ -20,15 +20,18 @@
 
 .container-cards {
   width: 100%;
-  max-width: 1200px;
-  margin: auto;
+  max-width: 600px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1.5rem;
 }
 
 .publicacion-vertical {
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .cards {
@@ -291,7 +294,7 @@
 .container-perfil-usuario {
   background: linear-gradient(135deg, rgb(14, 39, 48) 0%, rgb(18, 52, 64) 100%);
   border-radius: 16px;
-  margin-left: 235px;
+  margin-left: 250px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   color: #fff;
 }

@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import { PublicacionM, Comentario } from '../../../interfaces/publicacion';
 import { PublicacionesUsuario } from '../../../services/publicacionesUsuario';
 import { Auth } from '../../../services/auth';
-import { ModificarPublicacion } from '../../../Classes/modificar-publicacion';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -22,8 +21,6 @@ export class PublicacionItemComponent {
 
   private publicacionService = inject(PublicacionesUsuario);
   private authService = inject(Auth);
-
-  modificarPublicacion = new ModificarPublicacion();
 
   mostrarComentarios = signal<boolean>(false);
   paginaActualComentarios = 1;
@@ -131,11 +128,12 @@ export class PublicacionItemComponent {
       .traerComentarios(this.publicacion._id, this.paginaActualComentarios)
       .subscribe({
         next: (res) => {
-          if (res.length < 6) this.hayMasComentarios.set(false);
+          const lista = res.comentarios;
+          if (lista.length < 3) this.hayMasComentarios.set(false);
           if (this.paginaActualComentarios === 1) {
-            this.comentarios.set(res);
+            this.comentarios.set(lista);
           } else {
-            this.comentarios.update((valores) => [...valores, ...res]);
+            this.comentarios.update((valores) => [...valores, ...lista]);
           }
         },
         error: (error) => {
@@ -149,24 +147,25 @@ export class PublicacionItemComponent {
   }
 
   enviarComentario() {
-    if (this.comentario() !== '') {
-      if (!this.authService.getSub) return;
-      this.modificarPublicacion.enviarComentario(
-        this.comentario(),
-        { userId: this.getSub, avatar: this.getAvatar, nombreUsuario: this.getNombreUsuario },
-        this.publicacion,
-      );
-      const comentario = {
-        usuario: {
-          userId: this.getSub,
-          avatar: this.getAvatar,
-          nombreUsuario: this.getNombreUsuario,
-        },
-        texto: this.comentario(),
-      };
-      this.comentarios.update((lista) => [...lista, comentario]);
-      this.comentario.set('');
-    }
+    const texto = this.comentario().trim();
+    if (!texto) return;
+    if (!this.authService.getSub) return;
+
+    const usuario = {
+      userId: this.getSub,
+      avatar: this.getAvatar,
+      nombreUsuario: this.getNombreUsuario,
+    };
+
+    this.publicacionService.agregarComentario(this.publicacion._id, texto, usuario).subscribe({
+      next: (comentarioNuevo) => {
+        this.comentarios.update((lista) => [...lista, comentarioNuevo]);
+        this.comentario.set('');
+      },
+      error: (err) => {
+        Swal.fire({ title: err.error?.message ?? 'Error al comentar', icon: 'error', draggable: true });
+      }
+    });
   }
 
   editarComentario(comentarioPublicado: Comentario) {
@@ -181,30 +180,33 @@ export class PublicacionItemComponent {
   }
 
   guardarEdicion() {
-    this.comentarios.update((lista) =>
-      lista.map((c) =>
-        c._id === this.comentarioPublicado!._id ? { ...c, texto: this.comentario() } : c,
-      ),
-    );
     if (
       !this.comentarioPublicado ||
+      !this.comentarioPublicado._id ||
       this.comentario() === '' ||
       this.comentario() === this.comentarioPublicado.texto
-    )
-      return;
-    this.modificarPublicacion
-      .editarComentario(this.comentarioPublicado, this.publicacion, this.comentario())
-      ?.subscribe({
-        next: (res) => {
-          console.log(res);
+    ) return;
+
+    const textoNuevo = this.comentario();
+
+    this.publicacionService
+      .editarComentario(this.publicacion._id, this.comentarioPublicado._id!, textoNuevo)
+      .subscribe({
+        next: (comentarioActualizado) => {
+          this.comentarios.update((lista) =>
+            lista.map((c) =>
+              c._id === comentarioActualizado._id
+                ? { ...c, texto: comentarioActualizado.texto, modificado: true }
+                : c,
+            ),
+          );
+          this.comentario.set('');
+          this.editando.set(false);
+          this.comentarioPublicado = undefined;
         },
         error: (error) => {
           const err = error.error?.message;
           Swal.fire({ title: err, icon: 'error', draggable: true });
-        },
-        complete: () => {
-          this.comentario.set('');
-          this.editando.set(false);
         },
       });
   }

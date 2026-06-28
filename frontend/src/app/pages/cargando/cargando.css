@@ -1,0 +1,62 @@
+.cargando-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+}
+
+.cargando-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem 4rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Spinner animado estilo ring */
+.spinner-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.spinner-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 6px solid #7c6aff;
+  border-radius: 50%;
+  animation: spinner-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #7c6aff transparent transparent transparent;
+}
+.spinner-ring div:nth-child(1) { animation-delay: -0.45s; }
+.spinner-ring div:nth-child(2) { animation-delay: -0.3s; }
+.spinner-ring div:nth-child(3) { animation-delay: -0.15s; }
+
+@keyframes spinner-ring {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cargando-titulo {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+.cargando-subtitulo {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+  margin: 0;
+}

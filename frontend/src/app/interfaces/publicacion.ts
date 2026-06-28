@@ -30,6 +30,8 @@ export interface Comentario
     _id?: string;
     usuario: UsuarioC;
     texto : string;
+    modificado?: boolean;
+    created_at?: string;
 }
 export interface ComentarioCount
 {
