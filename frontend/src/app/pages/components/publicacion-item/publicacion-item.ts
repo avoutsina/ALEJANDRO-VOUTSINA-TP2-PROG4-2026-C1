@@ -35,16 +35,42 @@ export class PublicacionItemComponent {
   editando = signal<boolean>(false);
   comentarioPublicado?: Partial<Comentario>;
 
-  get getSub() { return this.authService.getSub as string; }
-  get getAvatar() { return this.authService.getAvatar as string; }
-  get getNombreUsuario() { return this.authService.getNombreUsuario as string; }
-  get getPermiso() { return this.authService.getPermiso; }
+  get getSub() {
+    return this.authService.getSub as string;
+  }
+  get getAvatar() {
+    return this.authService.getAvatar as string;
+  }
+  get getNombreUsuario() {
+    return this.authService.getNombreUsuario as string;
+  }
+  get getPermiso() {
+    return this.authService.getPermiso;
+  }
 
   likear() {
-    // Para actualizar la lista de likes en el padre o localmente.
-    // Creamos un WritableSignal local/falso o pasamos la lógica
-    const localSignal = signal<PublicacionM[]>([this.publicacion]);
-    this.modificarPublicacion.likearPublicacion(this.publicacion, localSignal);
+    if (!this.publicacion?._id) return;
+    const userId = this.authService.getSub;
+    if (!userId) return;
+
+    const yaDioLike = this.publicacion.meGustaId?.includes(userId);
+    const request = yaDioLike
+      ? this.publicacionService.quitarLike(this.publicacion._id)
+      : this.publicacionService.darLike(this.publicacion._id);
+
+    request.subscribe({
+      next: (res) => {
+        this.publicacion = {
+          ...this.publicacion,
+          meGusta: res.meGusta,
+          meGustaId: res.meGustaId,
+        };
+      },
+      error: (error) => {
+        const err = error.error?.message ?? 'Error al actualizar like';
+        Swal.fire({ title: err, icon: 'error', draggable: true });
+      },
+    });
   }
 
   eliminarPublicacion() {
@@ -67,7 +93,7 @@ export class PublicacionItemComponent {
           error: (error) => {
             const err = error.error?.message ?? 'Error al eliminar';
             Swal.fire({ title: err, icon: 'error' });
-          }
+          },
         });
       }
     });
@@ -101,23 +127,25 @@ export class PublicacionItemComponent {
   traerComentarios() {
     this.cargandoComentarios.set(true);
     this.hayMasComentarios.set(true);
-    this.publicacionService.traerComentarios(this.publicacion._id, this.paginaActualComentarios).subscribe({
-      next: (res) => {
-        if (res.length < 6) this.hayMasComentarios.set(false);
-        if (this.paginaActualComentarios === 1) {
-          this.comentarios.set(res);
-        } else {
-          this.comentarios.update(valores => [...valores, ...res]);
-        }
-      },
-      error: (error) => {
-        const err = error.error?.message;
-        Swal.fire({ title: err, icon: 'error', draggable: true });
-      },
-      complete: () => {
-        this.cargandoComentarios.set(false);
-      }
-    });
+    this.publicacionService
+      .traerComentarios(this.publicacion._id, this.paginaActualComentarios)
+      .subscribe({
+        next: (res) => {
+          if (res.length < 6) this.hayMasComentarios.set(false);
+          if (this.paginaActualComentarios === 1) {
+            this.comentarios.set(res);
+          } else {
+            this.comentarios.update((valores) => [...valores, ...res]);
+          }
+        },
+        error: (error) => {
+          const err = error.error?.message;
+          Swal.fire({ title: err, icon: 'error', draggable: true });
+        },
+        complete: () => {
+          this.cargandoComentarios.set(false);
+        },
+      });
   }
 
   enviarComentario() {
@@ -126,13 +154,17 @@ export class PublicacionItemComponent {
       this.modificarPublicacion.enviarComentario(
         this.comentario(),
         { userId: this.getSub, avatar: this.getAvatar, nombreUsuario: this.getNombreUsuario },
-        this.publicacion
+        this.publicacion,
       );
       const comentario = {
-        usuario: { userId: this.getSub, avatar: this.getAvatar, nombreUsuario: this.getNombreUsuario },
-        texto: this.comentario()
+        usuario: {
+          userId: this.getSub,
+          avatar: this.getAvatar,
+          nombreUsuario: this.getNombreUsuario,
+        },
+        texto: this.comentario(),
       };
-      this.comentarios.update(lista => [...lista, comentario]);
+      this.comentarios.update((lista) => [...lista, comentario]);
       this.comentario.set('');
     }
   }
@@ -149,23 +181,32 @@ export class PublicacionItemComponent {
   }
 
   guardarEdicion() {
-    this.comentarios.update(lista =>
-      lista.map(c =>
-        c._id === this.comentarioPublicado!._id ? { ...c, texto: this.comentario() } : c
-      )
+    this.comentarios.update((lista) =>
+      lista.map((c) =>
+        c._id === this.comentarioPublicado!._id ? { ...c, texto: this.comentario() } : c,
+      ),
     );
-    if (!this.comentarioPublicado || this.comentario() === '' || this.comentario() === this.comentarioPublicado.texto) return;
-    this.modificarPublicacion.editarComentario(this.comentarioPublicado, this.publicacion, this.comentario())?.subscribe({
-      next: (res) => { console.log(res); },
-      error: (error) => {
-        const err = error.error?.message;
-        Swal.fire({ title: err, icon: 'error', draggable: true });
-      },
-      complete: () => {
-        this.comentario.set('');
-        this.editando.set(false);
-      }
-    });
+    if (
+      !this.comentarioPublicado ||
+      this.comentario() === '' ||
+      this.comentario() === this.comentarioPublicado.texto
+    )
+      return;
+    this.modificarPublicacion
+      .editarComentario(this.comentarioPublicado, this.publicacion, this.comentario())
+      ?.subscribe({
+        next: (res) => {
+          console.log(res);
+        },
+        error: (error) => {
+          const err = error.error?.message;
+          Swal.fire({ title: err, icon: 'error', draggable: true });
+        },
+        complete: () => {
+          this.comentario.set('');
+          this.editando.set(false);
+        },
+      });
   }
 
   abrirVistaPrevia() {
