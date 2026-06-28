@@ -1,0 +1,156 @@
+<div class="mb-5 d-grid justify-content-center cards p-3">
+    <div class="d-flex align-items-center justify-content-between mt-1 mb-2">
+        <div class="d-flex align-items-center gap-3">
+            @if(publicacion.avatar)
+            {
+                <div class="mb-2 view cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
+                    <img [src]="publicacion.avatar" alt="avatar">
+                </div>
+            }
+            @else
+            {
+                <div class="mb-2 cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
+                    <img src="/assets/User.svg" alt="avatar" width="55px">
+                </div>
+            }
+            <h4 class="cursor-pointer m-0" [routerLink]="['/perfil', publicacion.userId]">{{publicacion.nombreUsuario | titlecase}}</h4>
+        </div>
+        @if(publicacion.userId === getSub || getPermiso)
+        {
+            <button class="btn btn-sm btn-outline-danger ms-2" (click)="eliminarPublicacion()">
+                Eliminar
+            </button>
+        }
+    </div>
+
+    @if(publicacion.titulo)
+    {
+        <h5 class="mb-2 px-1">{{ publicacion.titulo }}</h5>
+    }
+
+    <div>
+        @if(publicacion.urlImg)
+        {
+            <div class="container-foto">
+                <img [src]="publicacion.urlImg" alt="foto">
+                <div class="container-ver-imagen d-flex align-items-center justify-content-center">
+                    <div (click)="abrirVistaPrevia()">
+                        <button class="btn btn-secondary verImagen icono-btn">Ver imagen</button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center container-stats">
+            <div class="d-flex justify-content-center align-items-center">
+                @if(publicacion.meGustaId.includes(getSub))
+                {
+                    <div (click)="likear()">
+                        <img src="/assets/Like-Rojo.svg" alt="likeRojo" class="icono">
+                    </div>
+                }
+                @else
+                {
+                    <div (click)="likear()">
+                        <img src="/assets/Like.svg" alt="like" class="icono">
+                    </div>
+                }
+                <p class="m-0">{{publicacion.meGusta}}</p>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                @if(!this.cargandoComentarios())
+                {
+                    <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3"
+                        (click)="expandirComentarios()">
+                }
+                @else
+                {
+                    <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3 cargando">
+                }
+                <p class="m-0">{{publicacion.comentarios.length}}</p>
+            </div>
+
+            <p class="m-0">{{publicacion.created_at | date:'dd-MM-yyyy' }}</p>
+        </div>
+
+        @if(publicacion.descripcion)
+        {
+            <div class="descripcion text-center mb-4 mt-2">
+                <p class="m-0">{{publicacion.descripcion}}</p>
+            </div>
+        }
+
+        @if(mostrarComentarios())
+        {
+            <div class="container-comentarios">
+                @for (comentario of this.comentarios(); track $index)
+                {
+                    <div class="d-flex align-items-center gap-2 mb-3 container-comentario">
+                        <div class="view usuario-comentario">
+                            @if(comentario.usuario.avatar)
+                            {
+                                <img [src]="comentario.usuario.avatar" alt="miAvatar">
+                            }
+                            @else
+                            {
+                                <img src="/assets/User.svg" alt="avatar" width="55px">
+                            }
+                        </div>
+                         <div class="box-comment d-flex align-items-center">
+                             <div class="d-flex flex-column">
+                                 <small>{{comentario.usuario.nombreUsuario}}</small>
+                                 <p class="m-0 descripcion">{{comentario.texto}}</p>
+                             </div>
+                             @if(comentario.usuario.userId === getSub)
+                             {
+                                 <div class="container-edits align-items-center ms-2">
+                                    <div (click)="editarComentario(comentario)">
+                                        <img src="/assets/Editar.svg" alt="editar">
+                                    </div>
+                                 </div>
+                             }
+                         </div>
+                    </div>
+                }
+                @if(this.hayMasComentarios() && !this.cargandoComentarios())
+                {
+                    <div class="d-flex align-items-center justify-content-center mb-1">
+                        <button class="btn btn-secondary rounded-4 btn-sm" (click)="cargarMasComentarios()">Cargar Más</button>
+                    </div>
+                }      
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mt-2">
+                <div class="view imagen-comentario">
+                    @if(getAvatar)
+                    {
+                        <img [src]="getAvatar" alt="miAvatar">
+                    }
+                    @else
+                    {
+                        <img src="/assets/User.svg" alt="avatar" width="55px">
+                    }
+                </div>
+                <div class="container-input">
+                    <input
+                        type="text"
+                        id="comentar"
+                        placeholder="Agregar un comentario"
+                        class="form-control form-control-sm input-coment"
+                        [(ngModel)]="comentario"
+                        (keydown.enter)="editando()? guardarEdicion(): enviarComentario()"
+                    >
+                </div>
+
+                <div class="d-flex justify-content-center align-items-center mb-1 gap-2">
+                    @if(editando())
+                    {
+                        <img src="/assets/Cruz.svg" alt="Cancelar" class="icono" width="30px" (click)="cancelarEdicion()">
+                    }
+                    <img src="/assets/Send.svg" alt="Send" class="icono" width="30px" (click)="editando()? guardarEdicion(): enviarComentario()">
+                </div>
+            </div>
+        }
+    </div>
+</div>

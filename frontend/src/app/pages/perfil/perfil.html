@@ -1,123 +1,124 @@
 @if (!this.cargando()) {
-  <div class="container-principal-nav">
-    <div class="d-flex align-items-center justify-content-between container-nav">
-      <div class="d-flex align-items-center gap-3">
-        @if (
-          (this.seleccionoUsuario() && this.usuario()?.avatar && this.usuario()?.avatar !== '') ||
-          (!this.seleccionoUsuario() && this.getAvatar && this.getAvatar !== '')
-        ) {
-          <div class="view">
-            <img
-              [src]="this.seleccionoUsuario() ? this.usuario()?.avatar : this.getAvatar"
-              alt="avatar"
-              width="55px"
-            />
-          </div>
+  <!-- SECCIÓN: Datos del usuario -->
+  <div class="container-perfil-usuario py-4 px-3 mb-4">
+    <div class="d-flex align-items-center gap-4 flex-wrap">
+      <!-- Avatar grande -->
+      @if (
+        (this.seleccionoUsuario() && this.usuario()?.avatar) ||
+        (!this.seleccionoUsuario() && this.getAvatar)
+      ) {
+        <div class="avatar-grande">
+          <img
+            [src]="this.seleccionoUsuario() ? this.usuario()?.avatar : this.getAvatar"
+            alt="avatar"
+          />
+        </div>
+      } @else {
+        <div class="avatar-grande avatar-default d-flex align-items-center justify-content-center">
+          <img src="/assets/User.svg" alt="avatarDefault" width="70px" />
+        </div>
+      }
+
+      <!-- Información del usuario -->
+      <div class="d-flex flex-column gap-1 info-perfil">
+        <h2 class="m-0">
+          {{
+            (this.seleccionoUsuario() ? this.usuario()?.nombreUsuario : this.getNombreUsuario)
+              | titlecase
+          }}
+        </h2>
+
+        @if (this.usuario()?.nombre) {
+          <p class="m-0"><strong>Nombre:</strong> {{ this.usuario()?.nombre }}</p>
         } @else {
-          <div>
-            <img src="/assets/User.svg" alt="avatarDefault" width="55px" />
-          </div>
+          <p class="m-0"><strong>Nombre:</strong> {{ this.getNombreUsuario }}</p>
         }
-        <p class="mt-3">
-          {{ this.seleccionoUsuario() ? this.usuario()?.nombreUsuario : this.getNombreUsuario }}
-        </p>
+
+        @if (this.usuario()?.apellido) {
+          <p class="m-0"><strong>Apellido:</strong> {{ this.usuario()?.apellido }}</p>
+        }
+
+        @if (this.usuario()?.correo) {
+          <p class="m-0"><strong>Email:</strong> {{ this.usuario()?.correo }}</p>
+        }
+
+        @if (this.usuario()?.fechaDeNacimiento) {
+          <p class="m-0">
+            <strong>Fecha de nacimiento:</strong>
+            {{ this.usuario()?.fechaDeNacimiento | date: 'dd/MM/yyyy' }}
+          </p>
+        }
+
+        @if (this.seleccionoUsuario() && this.usuario()?.descripcion) {
+          <p class="m-0">
+            <em>{{ this.usuario()?.descripcion }}</em>
+          </p>
+        }
+
+        @if (!this.seleccionoUsuario()) {
+          <p class="m-0">
+            <strong>Rol:</strong> {{ this.getPermiso ? 'Administrador' : 'Usuario' }}
+          </p>
+        }
       </div>
-      <h1 class="ms-5">
-        {{ this.seleccionoUsuario() ? this.usuario()?.nombreUsuario : 'TU PERFIL' }}
-      </h1>
+
+      <!-- Botón editar solo si es tu propio perfil -->
+      @if (!this.seleccionoUsuario()) {
+        <div class="ms-auto">
+          <h5 class="perfil-titulo m-0">TU PERFIL</h5>
+        </div>
+      }
     </div>
   </div>
 
-  <div class="mt-5 margen">
+  <!-- Título sección publicaciones -->
+  <div class="margen">
+    <h3 class="mb-3">
+      {{
+        this.seleccionoUsuario()
+          ? 'Últimas publicaciones de ' + (this.usuario()?.nombreUsuario | titlecase)
+          : 'Mis últimas publicaciones'
+      }}
+    </h3>
+
     @if (misPublicaciones().length > 0) {
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 container-cards mb-5">
-        @for (publicacion of misPublicaciones(); track $index) {
-          <div class="col d-flex">
-            <div class="cards p-3 d-flex flex-column justify-content-center align-items-center">
-              <!-- Nombre y avatar del usuario -->
-              <div class="d-flex gap-3 mt-1 mb-2 align-items-center">
-                @if (publicacion.avatar !== '') {
-                  <div class="mb-2 view">
-                    <img [src]="publicacion.avatar" alt="subir" />
-                  </div>
-                } @else {
-                  <div class="mb-2">
-                    <img src="/assets/User.svg" alt="subir" width="55px" />
-                  </div>
-                }
-                <h5>{{ publicacion.nombreUsuario | titlecase }}</h5>
-                @if (!this.seleccionoUsuario() || this.getPermiso) {
-                  <img
-                    src="/assets/Trash.svg"
-                    alt="eliminar"
-                    class="icono"
-                    (click)="eliminarPublicacion(publicacion._id)"
-                  />
-                }
-              </div>
-
-              <div class="container-foto m-auto mb-3">
-                <div class="container-ver-imagen">
-                  <button class="btn btn-secondary boton" (click)="verImagen(publicacion)">
-                    Ver imagen
-                  </button>
-                  <img [src]="publicacion.urlImg" alt="foto" />
-                </div>
-              </div>
-
-              <div class="text-center">
-                <p class="m-0">{{ publicacion.descripcion }}</p>
-              </div>
-              <div class="d-flex justify-content-between align-items-center container-stats">
-                <div class="d-flex justify-content-center align-items-center gap-1">
-                  @if (publicacion.meGustaId.includes(getSub)) {
-                    <div (click)="likearPublicacion(publicacion)">
-                      <img src="/assets/Like-Rojo.svg" alt="likeRojo" />
-                    </div>
-                  } @else {
-                    <div (click)="likearPublicacion(publicacion)">
-                      <img src="/assets/Like.svg" alt="like" />
-                    </div>
-                  }
-                  <!-- Agrego el contador de likes -->
-                  <p class="m-0 mt-1">{{ publicacion.meGusta }}</p>
-                </div>
-                <div class="d-flex justify-content-center align-items-center gap-1 ms-4">
-                  <img src="/assets/Comentarios.svg" alt="" class="comentario-stat" />
-                  <p class="m-0">{{ publicacion.comentarios.length }}</p>
-                </div>
-                <p class="m-0">{{ publicacion.created_at | date: 'dd-MM-yyyy' }}</p>
-              </div>
-            </div>
+      <div class="container-cards mb-5">
+        @for (publicacion of misPublicaciones(); track publicacion._id) {
+          <div class="publicacion-vertical d-flex w-100">
+            <app-publicacion-item
+              class="w-100"
+              [publicacion]="publicacion"
+              (eliminar)="removerPublicacionDeLista($event)"
+              (verImagen)="verImagen($event)"
+            >
+            </app-publicacion-item>
           </div>
         }
       </div>
+
       @if (this.hayMasPublicaciones()) {
         <div class="container-cargar-mas">
-          <button class="btn btn-secondary boton-crear" (click)="cargarMas()">Cargar Mas</button>
+          <button class="btn btn-secondary boton-crear" (click)="cargarMas()">Cargar Más</button>
         </div>
       }
-      <!-- Muestro imagen y comentarios si presiono el voton de Ver imagen -->
+
+      <!-- Vista previa imagen + comentarios completos -->
       @if (mostrarVistaPrevia()) {
         <div class="container-overlay d-flex justify-content-center align-items-center">
           <div class="container-preview-overlay d-flex flex-column align-items-center p-4 gap-3">
-            <div class="d-flex justify-content-start gap-5">
+            <div class="d-flex justify-content-start gap-5 w-100">
               <div class="sector-izquierdo d-flex flex-column gap-3">
-                <div
-                  class="d-flex align-items-center gap-3 text-align-center justify-content-between"
-                >
-                  <!-- Si tiene avatar lo pongo si no uso el dafault -->
-                  <div class="d-flex align-items-center gap-3 text-align-center">
-                    @if (this.publicacion?.avatar !== '') {
+                <div class="d-flex align-items-center gap-3 justify-content-between">
+                  <div class="d-flex align-items-center gap-3">
+                    @if (this.publicacion?.avatar) {
                       <div class="view">
-                        <img [src]="this.publicacion?.avatar" alt="subir" />
+                        <img [src]="this.publicacion?.avatar" alt="avatar" />
                       </div>
                     } @else {
                       <div>
-                        <img src="/assets/User.svg" alt="subir" width="55px" />
+                        <img src="/assets/User.svg" alt="avatar" width="55px" />
                       </div>
                     }
-                    <!-- Pongo el nombre de usuario -->
                     <h5 class="m-0">{{ this.publicacion?.nombreUsuario | titlecase }}</h5>
                   </div>
                   <div>
@@ -126,9 +127,15 @@
                     </h6>
                   </div>
                 </div>
+                @if (this.publicacion?.titulo) {
+                  <h5 class="text-center m-0">{{ this.publicacion?.titulo }}</h5>
+                }
                 <div class="d-flex justify-content-center align-items-center preview-content">
                   <img [src]="this.publicacion?.urlImg" alt="vista previa" class="preview-img" />
                 </div>
+                @if (this.publicacion?.descripcion) {
+                  <p class="text-center m-0">{{ this.publicacion?.descripcion }}</p>
+                }
               </div>
 
               <div class="sector-derecho d-flex flex-column mt-2">
@@ -136,15 +143,13 @@
                 <div class="container-comentarios mt-3">
                   @for (comentario of this.comentarios(); track $index) {
                     <div class="d-flex align-items-center gap-2 mb-3 comentarios">
-                      <!-- Muestro el avatar del usuario del comentario -->
                       <div class="view usuario-comentario">
                         @if (comentario.usuario.avatar) {
                           <img [src]="comentario.usuario.avatar" alt="miAvatar" />
                         } @else {
-                          <img src="/assets/User.svg" alt="subir" width="55px" />
+                          <img src="/assets/User.svg" alt="avatar" width="55px" />
                         }
                       </div>
-                      <!-- Muestro solo el texto del comentario con iconos para manipularlo -->
                       <div class="box-comment d-flex align-items-center">
                         <div class="d-flex flex-column">
                           <small>{{ comentario.usuario.nombreUsuario }}</small>
@@ -166,23 +171,21 @@
                         class="btn btn-secondary rounded-4 btn-sm"
                         (click)="cargarMasComentarios(this.publicacion?._id)"
                       >
-                        Cargar Mas
+                        Cargar Más
                       </button>
                     </div>
                   }
                 </div>
 
-                <!-- Agrego un input para crear un comentario -->
+                <!-- Input comentario -->
                 <div class="d-flex align-items-center gap-2 mt-2 container-input-comentario">
-                  <!-- Muestro avatar si tiene -->
                   <div class="view avatar-input">
-                    @if (getAvatar !== '') {
+                    @if (getAvatar) {
                       <img [src]="getAvatar" alt="miAvatar" />
                     } @else {
-                      <img src="/assets/User.svg" alt="subir" width="55px" />
+                      <img src="/assets/User.svg" alt="avatar" width="55px" />
                     }
                   </div>
-                  <!-- Input del comentario, envio con enter-->
                   <div class="container-input">
                     <input
                       type="text"
@@ -197,8 +200,6 @@
                       "
                     />
                   </div>
-
-                  <!-- Boton para enviar comentario -->
                   <div class="d-flex justify-content-center align-items-center mb-1 gap-2">
                     @if (editando()) {
                       <img
@@ -231,8 +232,14 @@
       }
     } @else {
       <div class="text-center">
-        <h3>Hola {{ getNombreUsuario }} Todavia no tienes publicaciones</h3>
-        <p class="mt-3">Aún no tienes publicaciones.</p>
+        <h3>
+          {{
+            this.seleccionoUsuario()
+              ? (this.usuario()?.nombreUsuario | titlecase) + ' todavía no tiene publicaciones'
+              : 'Hola ' + getNombreUsuario + ', todavía no tienes publicaciones'
+          }}
+        </h3>
+        <p class="mt-3">Aún no hay publicaciones para mostrar.</p>
       </div>
     }
   </div>

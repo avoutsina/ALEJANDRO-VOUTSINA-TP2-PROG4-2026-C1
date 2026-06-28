@@ -2,8 +2,9 @@ import { UsuarioC } from "./usuario";
 
 export interface Publicacion
 {
+    titulo: string;
     userId : string;
-    urlImg : string;
+    urlImg ?: string;
     descripcion: string;
     nombreUsuario: string;
     avatar: string;
@@ -11,6 +12,7 @@ export interface Publicacion
 export interface PublicacionM
 {
     _id: string
+    titulo: string;
     userId : string;
     urlImg : string;
     descripcion: string;
@@ -19,6 +21,7 @@ export interface PublicacionM
     meGusta?: number
     meGustaId: string[]
     comentarios: Comentario[];
+    eliminado?: boolean;
     created_at: number
 }
 

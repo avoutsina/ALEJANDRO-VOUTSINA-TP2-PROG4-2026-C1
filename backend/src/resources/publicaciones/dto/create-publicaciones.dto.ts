@@ -1,36 +1,45 @@
-import { Type } from "class-transformer";
-import { IsDefined, IsNumber, IsOptional, IsString } from "class-validator";
-import { Comentario } from "../entities/comentario";
+import { Type } from 'class-transformer';
+import { IsDefined, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Comentario } from '../entities/comentario';
 
-export class CreatePublicacioneDto
-{
-    @IsString()
-    @IsDefined()
-    userId!: string;
+export class CreatePublicacioneDto {
+  @IsString()
+  @IsDefined()
+  titulo!: string;
 
-    @IsString()
-    @IsDefined()
-    urlImg!: string;
+  @IsString()
+  @IsOptional()
+  userId?: string;
 
-    @IsString()
-    descripcion!: string;
+  @IsString()
+  @IsOptional()
+  urlImg?: string;
 
-    @IsString()
-    @IsDefined()
-    nombreUsuario!: string;
+  @IsString()
+  @IsOptional()
+  publicId?: string;
 
-    @IsString()
-    avatar!: string;
+  @IsString()
+  @IsOptional()
+  descripcion?: string;
 
-    @IsNumber()
-    @IsOptional()
-    @Type(() => Number)
-    meGusta!: number;
+  @IsString()
+  @IsOptional()
+  nombreUsuario?: string;
 
-    @IsString()
-    @IsOptional({ each: true })
-    meGustaId!: string[];
+  @IsString()
+  @IsOptional()
+  avatar?: string;
 
-    @IsOptional()
-    comentarios!: Comentario[];
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  meGusta!: number;
+
+  @IsString()
+  @IsOptional({ each: true })
+  meGustaId!: string[];
+
+  @IsOptional()
+  comentarios!: Comentario[];
 }

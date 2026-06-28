@@ -1,224 +1,85 @@
-@if(!this.cargando())
-{
-    <div class="d-flex gap-3 container-ordenar pt-4">
-        <label for="ordenar" class="mt-1">Ordenar por</label>
-        <select id="ordenar" class="p-2" [(ngModel)]="ordenar" (change)="selecciono()">
-            <option value="fecha">Fecha</option>
-            <option value="masLikes">Mas Likes</option>
-            <option value="menosLikes">Menos Likes</option>
-        </select>
-    </div>
-    <div class="w-100 d-grid justify-content-center container-principal">
-        <div class="d-grid justify-content-center container-cards">
-            <div class="d-flex align-center justify-content-center mb-4 mt-3">
-                <h1>PUBLICACIONES</h1>
-            </div>
+@if (!this.cargando()) {
+  <div class="d-flex gap-3 container-ordenar pt-4">
+    <label for="ordenar" class="mt-1">Ordenar por</label>
+    <select id="ordenar" class="p-2" [(ngModel)]="ordenar" (change)="selecciono()">
+      <option value="fecha">Fecha</option>
+      <option value="masLikes">Más Likes</option>
+      <option value="menosLikes">Menos Likes</option>
+    </select>
+  </div>
+  <div class="w-100 d-grid justify-content-center container-principal">
+    <div class="d-grid justify-content-center container-cards">
+      <div class="d-flex align-center justify-content-between mb-4 mt-3 header-publicaciones">
+        <h1>PUBLICACIONES</h1>
+        <button class="btn btn-primary btn-sm boton-crear-publicacion" [routerLink]="['/crear']">
+          Nueva publicación
+        </button>
+      </div>
 
-            <!-- Traer todas las publicaciones -->
-            @for (publicacion of publicaciones(); track $index)
-            {
-                <div class="mb-5 d-grid justify-content-center cards p-3">
-                    <div class="d-flex align-items-center gap-3 mt-1 mb-2">
-                        <!-- Si tiene avatar lo pongo si no uso el dafault -->
-                        @if(publicacion.avatar !== "")
-                        {
-                            <div class="mb-2 view cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
-                                <img [src]="publicacion.avatar" alt="subir">
-                            </div>
-                        }
-                        @else
-                        {
-                            <div class="mb-2 cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
-                                <img src="/assets/User.svg" alt="subir" width="55px">
-                            </div>
-                        }
-                        <!-- Pongo el nombre de usuario -->
-                        <h4 class="cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">{{publicacion.nombreUsuario | titlecase}}</h4>
-                    </div>
-                    <div>
-                        <!-- Pongo la imagen de la publicacion -->
-                        <div class="container-foto">
-                            <img [src]="publicacion.urlImg" alt="foto">
-                            <div class="container-ver-imagen d-flex align-items-center justify-content-center">
-                                <div (click)="verImagen(publicacion)">
-                                    <button class="btn btn-secondary verImagen icono">Ver imagen</button>
-                                </div>
-                            </div>
-                        </div>
+      <!-- Traer todas las publicaciones -->
+      @for (publicacion of publicaciones(); track publicacion._id) {
+        <app-publicacion-item
+          [publicacion]="publicacion"
+          (eliminar)="removerPublicacionDeLista($event)"
+          (verImagen)="verImagen($event)"
+        >
+        </app-publicacion-item>
+      }
 
-                        <!-- Agrego icono de like -->
-                        <div class="d-flex justify-content-between align-items-center container-stats">
-                            <div class="d-flex justify-content-center align-items-center">
-                                @if(publicacion.meGustaId.includes(getSub))
-                                {
-                                    <div (click)="likearPublicacion(publicacion)">
-                                        <img src="/assets/Like-Rojo.svg" alt="likeRojo" class="icono">
-                                    </div>
-                                }
-                                @else
-                                {
-                                    <div (click)="likearPublicacion(publicacion)">
-                                        <img src="/assets/Like.svg" alt="like" class="icono">
-                                    </div>
-                                }
-                                <!-- Agrego el contador de likes -->
-                                <p class="m-0">{{publicacion.meGusta}}</p>
-                            </div>
-
-                            <!-- Agrego el contador de comentarios -->
-                            <div class="d-flex justify-content-center align-items-center">
-                                @if(!this.cargandoComentarios())
-                                {
-                                    @if(!mostrarComentarios())
-                                    {
-                                        <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3" (click)="expandirComentarios(publicacion._id)">
-                                    }
-                                    @else
-                                    {
-                                        <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3" (click)="contraerComentarios()">
-                                    }
-                                }
-                                @else
-                                {
-                                    <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3 cargando">
-                                }
-                                <p class="m-0">{{publicacion.comentarios.length}}</p>
-                            </div>
-
-                            <!-- Agrego la fecha en la que se creo la publicacion -->
-                            <p class="m-0">{{publicacion.created_at | date:'dd-MM-yyyy' }}</p>
-                        </div>
-
-                        <!-- Agrego la descripcion de la publicacion -->
-                        <div class="descripcion text-center mb-4 mt-2">
-                            <p class="m-0">{{publicacion.descripcion}}</p>
-                        </div>
-
-                        <!-- Muestro todos los comentarios si presiono el icono -->
-                        @if(mostrarComentarios() === publicacion._id)
-                        {
-                            <div class="container-comentarios">
-                                @for (comentario of this.comentarios(); track $index)
-                                {
-                                    <div class="d-flex align-items-center gap-2 mb-3 container-comentario">
-                                        <!-- Muestro el avatar del usuario del comentario -->
-                                        <div class="view usuario-comentario">
-                                            @if(comentario.usuario.avatar)
-                                            {
-                                                <img [src]="comentario.usuario.avatar" alt="miAvatar">
-                                            }
-                                            @else
-                                            {
-                                                <img src="/assets/User.svg" alt="subir" width="55px">
-                                            }
-                                        </div>
-                                        <!-- Muestro solo el texto del comentario con iconos para manipularlo -->
-                                         <div class="box-comment d-flex align-items-center">
-                                             <div class="d-flex flex-column">
-                                                 <small>{{comentario.usuario.nombreUsuario}}</small>
-                                                 <p class="m-0 descripcion">{{comentario.texto}}</p>
-                                             </div>
-                                             @if(comentario.usuario.userId === getSub)
-                                             {
-                                                 <div class="container-edits align-items-center ms-2">
-                                                    <div (click)="editarComentario(comentario)">
-                                                        <img src="/assets/Editar.svg" alt="editar">
-                                                    </div>
-                                                 </div>
-                                             }
-                                         </div>
-                                    </div>
-                                }
-                                @if(this.hayMasComentarios() && !this.cargandoComentarios())
-                                {
-                                    <div class="d-flex align-items-center justify-content-center mb-1">
-                                        <button class="btn btn-secondary rounded-4 btn-sm" (click)="cargarMas(publicacion._id)">Cargar Mas</button>
-                                    </div>
-                                }      
-                            </div>
-
-                            <!-- Agrego un input para crear un comentario -->
-                            <div class="d-flex align-items-center gap-2 mt-2">
-
-                                <!-- Muestro avatar si tiene -->
-                                <div class="view imagen-comentario">
-                                    @if(getAvatar !== "")
-                                    {
-                                        <img [src]="getAvatar" alt="miAvatar">
-                                    }
-                                    @else
-                                    {
-                                        <img src="/assets/User.svg" alt="subir" width="55px">
-                                    }
-                                </div>
-                                <!-- Input del comentario, envio con enter-->
-                                <div class="container-input">
-                                    <input
-                                        type="text"
-                                        id="comentar"
-                                        placeholder="Agregar un comentario"
-                                        class="form-control form-control-sm input-coment"
-                                        [(ngModel)]="comentario"
-                                        (keydown.enter)="editando()? guardarEdicion(publicacion): enviarComentario(publicacion)"
-                                    >
-                                </div>
-
-                                <!-- Boton para enviar comentario -->
-                                <div class="d-flex justify-content-center align-items-center mb-1 gap-2">
-                                    @if(editando())
-                                    {
-                                        <img src="/assets/Cruz.svg" alt="Cancelar" class="icono" width="30px" (click)="cancelarEdicion()">
-                                    }
-                                    <img src="/assets/Send.svg" alt="Send" class="icono" width="30px" (click)="editando()? guardarEdicion(publicacion): enviarComentario(publicacion)">
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-            <!-- Muestro imagen y comentarios si presiono el voton de Ver imagen -->
-            @if(mostrarVistaPrevia())
-            {
-                <div class="container-overlay d-flex justify-content-center align-items-center">
-                    <div class="preview-overlay d-flex flex-column align-items-around p-4 gap-4 ">
-                        <div class="d-flex align-items-center gap-3 text-align-center justify-content-between">
-                            <!-- Si tiene avatar lo pongo si no uso el dafault -->
-                                <div class="d-flex align-items-center gap-3 text-align-center">
-                                    @if(this.publicacion?.avatar !== "")
-                                    {
-                                        <div class="view">
-                                            <img [src]="this.publicacion?.avatar" alt="subir">
-                                        </div>
-                                    }
-                                    @else
-                                    {
-                                        <div>
-                                            <img src="/assets/User.svg" alt="subir" width="55px">
-                                        </div>
-                                    }
-                                    <!-- Pongo el nombre de usuario -->
-                                    <h4 class="m-0">{{this.publicacion?.nombreUsuario | titlecase}}</h4>
-                                </div>
-                            <div>
-                                <h5 class="m-0">{{this.publicacion?.created_at | date:'dd-MM-yyyy h:mm a' }}</h5>
-                            </div>
-                        </div>
-                        <div class="preview-content d-flex justify-content-center align-items-center">
-                            <img [src]="this.publicacion?.urlImg" alt="vista previa" class="preview-img">
-                        </div>
-                        <div class="d-flex flex-column gap-4">
-                            <button class="btn btn-secondary boton-vista-previa icono" (click)="cerrarVistaPrevia()">Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-            }
+      <!-- Botón Cargar más publicaciones -->
+      @if (hayMasPublicaciones() && !cargandoMas()) {
+        <div class="d-flex justify-content-center mb-4">
+          <button class="btn btn-secondary" (click)="cargarMasPublicaciones()">Cargar más</button>
         </div>
+      }
+      @if (cargandoMas()) {
+        <div class="d-flex justify-content-center mb-4">
+          <app-loading></app-loading>
+        </div>
+      }
+
+      <!-- Muestro imagen si presiono el botón de Ver imagen -->
+      @if (mostrarVistaPrevia()) {
+        <div class="container-overlay d-flex justify-content-center align-items-center">
+          <div class="preview-overlay d-flex flex-column align-items-around p-4 gap-4">
+            <div class="d-flex align-items-center gap-3 text-align-center justify-content-between">
+              <!-- Si tiene avatar lo pongo si no uso el default -->
+              <div class="d-flex align-items-center gap-3 text-align-center">
+                @if (this.publicacion?.avatar) {
+                  <div class="view">
+                    <img [src]="this.publicacion?.avatar" alt="avatar" />
+                  </div>
+                } @else {
+                  <div>
+                    <img src="/assets/User.svg" alt="avatar" width="55px" />
+                  </div>
+                }
+                <!-- Pongo el nombre de usuario -->
+                <h4 class="m-0">{{ this.publicacion?.nombreUsuario | titlecase }}</h4>
+              </div>
+              <div>
+                <h5 class="m-0">{{ this.publicacion?.created_at | date: 'dd-MM-yyyy h:mm a' }}</h5>
+              </div>
+            </div>
+            @if (this.publicacion?.titulo) {
+              <h4 class="text-center m-0">{{ this.publicacion?.titulo }}</h4>
+            }
+            <div class="preview-content d-flex justify-content-center align-items-center">
+              <img [src]="this.publicacion?.urlImg" alt="vista previa" class="preview-img" />
+            </div>
+            <div class="d-flex flex-column gap-4">
+              <button
+                class="btn btn-secondary boton-vista-previa icono"
+                (click)="cerrarVistaPrevia()"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
+  </div>
+} @else {
+  <app-loading></app-loading>
 }
-@else
-{
-    <app-loading></app-loading>
-}
-
-
-
