@@ -97,8 +97,18 @@ export class CloudinaryService {
       if (input.startsWith('http')) {
         const uploadIndex = input.indexOf('/upload/');
         if (uploadIndex >= 0) {
-          let path = input.substring(uploadIndex + '/upload/'.length);
-          path = path.replace(/v\d+\//, '');
+
+          const afterUpload = input.substring(uploadIndex + '/upload/'.length);
+          const versionMatch = afterUpload.match(/v\d+\//);
+          let path = afterUpload;
+          if (versionMatch && versionMatch.index !== undefined) {
+            path = afterUpload.substring(
+              versionMatch.index + versionMatch[0].length,
+            );
+          } else {
+
+            path = afterUpload;
+          }
           const lastDot = path.lastIndexOf('.');
           if (lastDot > -1) path = path.substring(0, lastDot);
           return path;
