@@ -17,9 +17,9 @@
         </div>
         @if(publicacion.userId === getSub || getPermiso)
         {
-            <button class="btn btn-sm btn-outline-danger ms-2" (click)="eliminarPublicacion()">
-                Eliminar
-            </button>
+            <div (click)="eliminarPublicacion()">
+                <img src="/assets/Trash.svg" alt="eliminar" class="icono">
+            </div>
         }
     </div>
 
