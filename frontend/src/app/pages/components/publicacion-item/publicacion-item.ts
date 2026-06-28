@@ -17,6 +17,7 @@ import Swal from 'sweetalert2';
 })
 export class PublicacionItemComponent {
   @Input() publicacion!: PublicacionM;
+  @Input() mostrarComentariosPorDefecto: boolean = false;
   @Output() eliminar = new EventEmitter<string>();
   @Output() verImagen = new EventEmitter<PublicacionM>();
 
@@ -26,6 +27,21 @@ export class PublicacionItemComponent {
   modificarPublicacion = new ModificarPublicacion();
 
   mostrarComentarios = signal<boolean>(false);
+  // Precarga comentarios (página 1) cuando la vista padre lo requiera (ej: Mi Perfil)
+  ngOnChanges(): void {
+    if (this.mostrarComentariosPorDefecto && this.publicacion?._id && !this.mostrarComentarios()) {
+      this.editando.set(false);
+      this.comentarioPublicado = undefined;
+      this.comentario.set('');
+      this.hayMasComentarios.set(true);
+      this.cargandoComentarios.set(false);
+
+      this.mostrarComentarios.set(true);
+      this.paginaActualComentarios = 1;
+      this.comentarios.set([]);
+      this.traerComentarios();
+    }
+  }
   paginaActualComentarios = 1;
   comentarios = signal<Comentario[]>([]);
   hayMasComentarios = signal<boolean>(true);
@@ -35,10 +51,18 @@ export class PublicacionItemComponent {
   editando = signal<boolean>(false);
   comentarioPublicado?: Partial<Comentario>;
 
-  get getSub() { return this.authService.getSub as string; }
-  get getAvatar() { return this.authService.getAvatar as string; }
-  get getNombreUsuario() { return this.authService.getNombreUsuario as string; }
-  get getPermiso() { return this.authService.getPermiso; }
+  get getSub() {
+    return this.authService.getSub as string;
+  }
+  get getAvatar() {
+    return this.authService.getAvatar as string;
+  }
+  get getNombreUsuario() {
+    return this.authService.getNombreUsuario as string;
+  }
+  get getPermiso() {
+    return this.authService.getPermiso;
+  }
 
   likear() {
     // Para actualizar la lista de likes en el padre o localmente.
@@ -67,7 +91,7 @@ export class PublicacionItemComponent {
           error: (error) => {
             const err = error.error?.message ?? 'Error al eliminar';
             Swal.fire({ title: err, icon: 'error' });
-          }
+          },
         });
       }
     });
@@ -101,23 +125,25 @@ export class PublicacionItemComponent {
   traerComentarios() {
     this.cargandoComentarios.set(true);
     this.hayMasComentarios.set(true);
-    this.publicacionService.traerComentarios(this.publicacion._id, this.paginaActualComentarios).subscribe({
-      next: (res) => {
-        if (res.length < 6) this.hayMasComentarios.set(false);
-        if (this.paginaActualComentarios === 1) {
-          this.comentarios.set(res);
-        } else {
-          this.comentarios.update(valores => [...valores, ...res]);
-        }
-      },
-      error: (error) => {
-        const err = error.error?.message;
-        Swal.fire({ title: err, icon: 'error', draggable: true });
-      },
-      complete: () => {
-        this.cargandoComentarios.set(false);
-      }
-    });
+    this.publicacionService
+      .traerComentarios(this.publicacion._id, this.paginaActualComentarios)
+      .subscribe({
+        next: (res) => {
+          if (res.length < 6) this.hayMasComentarios.set(false);
+          if (this.paginaActualComentarios === 1) {
+            this.comentarios.set(res);
+          } else {
+            this.comentarios.update((valores) => [...valores, ...res]);
+          }
+        },
+        error: (error) => {
+          const err = error.error?.message;
+          Swal.fire({ title: err, icon: 'error', draggable: true });
+        },
+        complete: () => {
+          this.cargandoComentarios.set(false);
+        },
+      });
   }
 
   enviarComentario() {
@@ -126,13 +152,17 @@ export class PublicacionItemComponent {
       this.modificarPublicacion.enviarComentario(
         this.comentario(),
         { userId: this.getSub, avatar: this.getAvatar, nombreUsuario: this.getNombreUsuario },
-        this.publicacion
+        this.publicacion,
       );
       const comentario = {
-        usuario: { userId: this.getSub, avatar: this.getAvatar, nombreUsuario: this.getNombreUsuario },
-        texto: this.comentario()
+        usuario: {
+          userId: this.getSub,
+          avatar: this.getAvatar,
+          nombreUsuario: this.getNombreUsuario,
+        },
+        texto: this.comentario(),
       };
-      this.comentarios.update(lista => [...lista, comentario]);
+      this.comentarios.update((lista) => [...lista, comentario]);
       this.comentario.set('');
     }
   }
@@ -149,23 +179,32 @@ export class PublicacionItemComponent {
   }
 
   guardarEdicion() {
-    this.comentarios.update(lista =>
-      lista.map(c =>
-        c._id === this.comentarioPublicado!._id ? { ...c, texto: this.comentario() } : c
-      )
+    this.comentarios.update((lista) =>
+      lista.map((c) =>
+        c._id === this.comentarioPublicado!._id ? { ...c, texto: this.comentario() } : c,
+      ),
     );
-    if (!this.comentarioPublicado || this.comentario() === '' || this.comentario() === this.comentarioPublicado.texto) return;
-    this.modificarPublicacion.editarComentario(this.comentarioPublicado, this.publicacion, this.comentario())?.subscribe({
-      next: (res) => { console.log(res); },
-      error: (error) => {
-        const err = error.error?.message;
-        Swal.fire({ title: err, icon: 'error', draggable: true });
-      },
-      complete: () => {
-        this.comentario.set('');
-        this.editando.set(false);
-      }
-    });
+    if (
+      !this.comentarioPublicado ||
+      this.comentario() === '' ||
+      this.comentario() === this.comentarioPublicado.texto
+    )
+      return;
+    this.modificarPublicacion
+      .editarComentario(this.comentarioPublicado, this.publicacion, this.comentario())
+      ?.subscribe({
+        next: (res) => {
+          console.log(res);
+        },
+        error: (error) => {
+          const err = error.error?.message;
+          Swal.fire({ title: err, icon: 'error', draggable: true });
+        },
+        complete: () => {
+          this.comentario.set('');
+          this.editando.set(false);
+        },
+      });
   }
 
   abrirVistaPrevia() {
