@@ -82,9 +82,9 @@
     </h3>
 
     @if (misPublicaciones().length > 0) {
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 container-cards mb-5">
+      <div class="container-cards mb-5">
         @for (publicacion of misPublicaciones(); track publicacion._id) {
-          <div class="col d-flex">
+          <div class="publicacion-vertical d-flex w-100">
             <app-publicacion-item
               class="w-100"
               [publicacion]="publicacion"

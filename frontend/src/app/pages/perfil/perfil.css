@@ -22,6 +22,13 @@
   width: 100%;
   max-width: 1200px;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.publicacion-vertical {
+  width: 100%;
 }
 
 .cards {
