@@ -113,8 +113,8 @@ export class DetallePage implements OnInit
     this.publicacionService.agregarComentario(pub._id, texto, usuario).subscribe({
       next: (comentarioNuevo) =>
       {
-        // Agregar el comentario retornado por el server (con _id real)
-        this.comentarios.update(lista => [comentarioNuevo, ...lista]);
+        // Agregar el comentario retornado por el server al final
+        this.comentarios.update(lista => [...lista, comentarioNuevo]);
         this.nuevoComentario.set('');
         this.totalComentarios++;
       },

@@ -201,7 +201,7 @@ export class Perfil {
 
     this.publicacionesService.agregarComentario(publicacion._id, texto, usuario).subscribe({
       next: (comentarioNuevo) => {
-        this.comentarios.update((lista) => [comentarioNuevo, ...lista]);
+        this.comentarios.update((lista) => [...lista, comentarioNuevo]);
         this.comentario.set('');
       },
       error: (err) => {

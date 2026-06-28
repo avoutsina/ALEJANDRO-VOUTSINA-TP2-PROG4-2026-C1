@@ -112,7 +112,7 @@ export class PublicacionesService {
       const resultado = await this.publicacionModel.aggregate([
         { $match: { _id: objectId, eliminado: { $ne: true } } },
         { $unwind: '$comentarios' },
-        { $sort: { 'comentarios.created_at': -1 } },
+        { $sort: { 'comentarios.created_at': 1 } },
         { $skip: skip },
         { $limit: limit },
         {
