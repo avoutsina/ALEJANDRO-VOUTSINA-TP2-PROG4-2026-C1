@@ -239,31 +239,17 @@ export class PublicacionesService {
 
   async remove(id: string) {
     try {
-      const publicacion = await this.publicacionModel.findById(id).exec();
+      const publicacion = await this.publicacionModel.findOneAndUpdate(
+        { _id: id, eliminado: { $ne: true } },
+        { eliminado: true },
+        { new: true },
+      );
       if (!publicacion) {
         throw new NotFoundException(
           'La publicación no existe o ya fue eliminada',
         );
       }
-
-      // Attempt to delete image from Cloudinary if publicId is present
-      try {
-        if (publicacion.publicId) {
-          const result = await this.cloudinaryService.deleteImage(
-            publicacion.publicId,
-          );
-          console.log(
-            'Cloudinary delete result for',
-            publicacion.publicId,
-            result,
-          );
-        }
-      } catch (err) {
-        console.error('Error deleting image from Cloudinary:', err);
-        // proceed to delete DB record even if Cloudinary deletion fails
-      }
-
-      await this.publicacionModel.findByIdAndDelete(id).exec();
+      // Baja lógica: marcamos `eliminado: true` y no eliminamos recursos en Cloudinary aquí.
       return publicacion;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
@@ -276,22 +262,8 @@ export class PublicacionesService {
 
   async removeAll(userId: string) {
     try {
-      const publicaciones = await this.publicacionModel.find({ userId }).exec();
-      const publicIds = publicaciones
-        .map((p) => p.publicId)
-        .filter((id) => id && id.length > 0);
-
-      try {
-        if (publicIds.length > 0) {
-          await this.cloudinaryService.deleteResources(publicIds);
-        }
-      } catch (err) {
-        console.error('Error deleting resources from Cloudinary:', err);
-        // continue to delete DB records even if Cloudinary deletion fails
-      }
-
       const resultado = await this.publicacionModel
-        .deleteMany({ userId })
+        .updateMany({ userId }, { eliminado: true })
         .exec();
       return resultado;
     } catch (err) {
