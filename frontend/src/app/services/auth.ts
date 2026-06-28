@@ -7,6 +7,7 @@ import { UsuarioL } from '../interfaces/usuario';
 import { UsuarioR } from '../interfaces/usuario';
 import Swal from 'sweetalert2';
 import { environments } from '../../environments/environments';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,8 @@ export class Auth
   public estado = signal<boolean>(false);
   private token = signal<string | null>(null);
   cargando = signal<boolean>(false);
-  
+  private sesionTimerId: ReturnType<typeof setTimeout> | null = null;
+
   constructor()
   {
     this.token.set(localStorage.getItem("Token"));
@@ -39,6 +41,8 @@ export class Auth
       {
         localStorage.setItem("Token", res.Token);
         this.token.set(res.Token);
+        this.estado.set(true);
+        this.iniciarContadorSesion();
         console.log(res);
       },
       error: (error) =>
@@ -118,12 +122,14 @@ export class Auth
     const peticion = this.httpClient.post<AuthResponse>(this.apiUrl + "/register", formData);
     peticion.subscribe
     ({
-      next: (res) => 
+      next: (res) =>
       {
         if(!permiso)
         {
           localStorage.setItem("Token", res.Token);
           this.token.set(res.Token);
+          this.estado.set(true);
+          this.iniciarContadorSesion();
         }
         console.log(res);
       },
@@ -145,7 +151,7 @@ export class Auth
           icon: "success",
           confirmButtonText: "Aceptar",
           draggable: true
-        }).then(result => 
+        }).then(result =>
         {
           if(result.isDismissed || result.isConfirmed)
           {
@@ -161,6 +167,88 @@ export class Auth
         });
       }
     });
+  }
+
+  /**
+   * Llama al endpoint POST /autorizar del backend para validar el token.
+   * Retorna Observable con los datos del usuario si el token es válido.
+   * Lanza 401 si el token es inválido o vencido.
+   */
+  autorizar(): Observable<any>
+  {
+    const token = this.token();
+    return this.httpClient.post<any>(
+      this.apiUrl + '/autorizar',
+      {},
+      { headers: { Authorization: `Bearer ${token ?? ''}` } }
+    );
+  }
+
+  /**
+   * Llama al endpoint POST /refrescar para obtener un nuevo token de 15 min.
+   */
+  refrescarToken(): Observable<{ Token: string }>
+  {
+    const token = this.token();
+    return this.httpClient.post<{ Token: string }>(
+      this.apiUrl + '/refrescar',
+      {},
+      { headers: { Authorization: `Bearer ${token ?? ''}` } }
+    );
+  }
+
+  /**
+   * Inicia un contador de 10 minutos al hacer login/register.
+   * Al terminar, muestra modal preguntando si desea extender la sesión.
+   * Si acepta → refresca el token y reinicia el contador.
+   * Si no → hace logout.
+   */
+  iniciarContadorSesion()
+  {
+    // Limpiar timer anterior si existe
+    if (this.sesionTimerId !== null) {
+      clearTimeout(this.sesionTimerId);
+      this.sesionTimerId = null;
+    }
+
+    const DIEZ_MINUTOS = 10 * 60 * 1000;
+
+    this.sesionTimerId = setTimeout(() =>
+    {
+      Swal.fire({
+        title: '⏳ Tu sesión está por vencer',
+        text: 'Te quedan 5 minutos de sesión. ¿Deseás extenderla?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, extender sesión',
+        cancelButtonText: 'No, cerrar sesión',
+        allowOutsideClick: false,
+        timer: 60000,
+        timerProgressBar: true,
+      }).then(result =>
+      {
+        if (result.isConfirmed)
+        {
+          this.refrescarToken().subscribe({
+            next: (res) =>
+            {
+              localStorage.setItem('Token', res.Token);
+              this.token.set(res.Token);
+              this.iniciarContadorSesion(); // Reinicia el contador por otros 10 min
+              Swal.fire({ title: 'Sesión extendida', icon: 'success', timer: 2000, showConfirmButton: false });
+            },
+            error: () =>
+            {
+              this.logout();
+            }
+          });
+        }
+        else
+        {
+          this.logout();
+        }
+      });
+    }, DIEZ_MINUTOS);
   }
 
   estaLogueado(): boolean
@@ -206,37 +294,19 @@ export class Auth
     // actualizar estado a "logueado"
     this.estado.set(true);
 
-    // avisar si quedan 5 minutos o menos (sin hacer logout aquí)
-    const segundosRestantes = expSegundos - ahoraSegundos;
-    if (segundosRestantes <= 300)
-    {
-      // Optional: evitar múltiples Swal seguidos. Por ejemplo usamos localStorage
-      // para marcar que ya mostramos la alerta recientemente.
-      const claveAviso = 'aviso-expiracion-mostrado';
-      const ultimaVez = Number(localStorage.getItem(claveAviso) || '0');
-      const ahoraMs = Date.now();
-
-      // mostramos la alerta sólo si no la mostramos en los últimos 60s
-      if (ahoraMs - ultimaVez > 60 * 1000)
-      {
-        localStorage.setItem(claveAviso, String(ahoraMs));
-        Swal.fire
-        ({
-          title: 'Tu sesión está por expirar',
-          text: 'Te quedan menos de 5 minutos',
-          icon: 'warning',
-          confirmButtonText: 'Aceptar',
-          allowOutsideClick: false,
-        });
-      }
-    }
     return true;
   }
-  
+
 
   logout()
   {
+    // Limpiar el timer de sesión si estaba activo
+    if (this.sesionTimerId !== null) {
+      clearTimeout(this.sesionTimerId);
+      this.sesionTimerId = null;
+    }
     localStorage.removeItem("Token");
+    localStorage.removeItem('aviso-expiracion-mostrado');
     this.token.set(null);
     this.estado.set(false);
     this.router.navigateByUrl("/login");
@@ -284,4 +354,3 @@ export class Auth
     return false
   }
 }
-

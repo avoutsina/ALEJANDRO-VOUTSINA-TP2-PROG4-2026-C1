@@ -4,11 +4,12 @@ import {
   Comentario,
   ComentarioCount,
   Publicacion,
-  PublicacionCount,
   PublicacionM,
+  PublicacionCount,
 } from '../interfaces/publicacion';
 import { Observable } from 'rxjs';
 import { environments } from '../../environments/environments';
+import { UsuarioC } from '../interfaces/usuario';
 
 @Injectable({ providedIn: 'root' })
 export class PublicacionesUsuario {
@@ -54,13 +55,35 @@ export class PublicacionesUsuario {
     });
   }
 
-  traerComentarios(id: string, paginaActual: number): Observable<Comentario[]> {
+  traerComentarios(id: string, paginaActual: number): Observable<{ comentarios: Comentario[]; total: number }> {
     let params = new HttpParams();
     params = params.set('pagina', paginaActual);
-    return this.httpClient.get<Comentario[]>(`${this.apiUrl}/comentarios/${id}`, {
+    return this.httpClient.get<{ comentarios: Comentario[]; total: number }>(`${this.apiUrl}/comentarios/${id}`, {
       headers: this.getToken(),
       params,
     });
+  }
+
+  traerPublicacionPorId(id: string): Observable<PublicacionM> {
+    return this.httpClient.get<PublicacionM>(`${this.apiUrl}/publicacion/${id}`, {
+      headers: this.getToken(),
+    });
+  }
+
+  agregarComentario(publicacionId: string, texto: string, usuario: UsuarioC): Observable<Comentario> {
+    return this.httpClient.post<Comentario>(
+      `${this.apiUrl}/comentarios/${publicacionId}`,
+      { texto, usuario },
+      { headers: this.getToken() }
+    );
+  }
+
+  editarComentario(publicacionId: string, comentarioId: string, texto: string): Observable<Comentario> {
+    return this.httpClient.put<Comentario>(
+      `${this.apiUrl}/comentarios/${publicacionId}/${comentarioId}`,
+      { texto },
+      { headers: this.getToken() }
+    );
   }
   traerMisComentarios(
     id: string,

@@ -190,3 +190,32 @@
 {
     width: 0px;
 }
+
+/* Badge "editado" para comentarios modificados */
+.badge-editado {
+    display: inline-block;
+    background: rgba(255, 193, 7, 0.18);
+    color: #f0c030;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    border-radius: 20px;
+    font-size: 0.65rem;
+    padding: 1px 7px;
+    font-style: italic;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+}
+
+/* Link a detalle de publicación */
+.link-detalle {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 2px 0;
+}
+.link-detalle:hover {
+    color: rgba(124, 106, 255, 0.9);
+    text-decoration: underline;
+}

@@ -9,8 +9,7 @@ import { CreatePublicacioneDto } from './dto/create-publicaciones.dto';
 import { UpdatePublicacioneDto } from './dto/update-publicaciones.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Publicaciones } from './entities/publicaciones.entity';
-import { Model } from 'mongoose';
-import { link } from 'fs';
+import { Model, Types } from 'mongoose';
 import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 
 @Injectable()
@@ -88,21 +87,126 @@ export class PublicacionesService {
   }
 
   async findComments(id: string, pagina: number) {
+    const paginaNumero = Number(pagina) || 1;
+    const limit = 6;
+    const skip = (paginaNumero - 1) * limit;
+
+    let objectId: Types.ObjectId;
     try {
-      const skip = (pagina - 1) * 6;
-      const porId = await this.publicacionModel
-        .findById({ _id: id })
-        .select({
-          comentarios: { $slice: [skip, 6] },
-        })
-        .sort({ created_at: 1 });
-      return porId?.comentarios;
+      objectId = new Types.ObjectId(id);
+    } catch {
+      throw new BadRequestException('ID de publicación inválido');
+    }
+
+    try {
+      // Contar total de comentarios de la publicación
+      const totalRes = await this.publicacionModel.aggregate([
+        { $match: { _id: objectId, eliminado: { $ne: true } } },
+        { $project: { total: { $size: '$comentarios' } } },
+      ]);
+      const total: number = totalRes[0]?.total ?? 0;
+
+      // Paginado real sobre el array embebido usando aggregate:
+      // - order más recientes primero
+      // - skip/limit
+      const resultado = await this.publicacionModel.aggregate([
+        { $match: { _id: objectId, eliminado: { $ne: true } } },
+        { $unwind: '$comentarios' },
+        { $sort: { 'comentarios.created_at': -1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $project: {
+            _id: 0,
+            comentarios: 1,
+          },
+        },
+      ]);
+
+      const comentarios = resultado.map((r: any) => r.comentarios);
+      return { comentarios, total };
     } catch {
       throw new HttpException(
         'No se encontraron comentarios',
         HttpStatus.NOT_FOUND,
       );
     }
+  }
+
+  async addComentario(publicacionId: string, body: any) {
+    const texto = body?.texto;
+    const usuario = body?.usuario;
+
+    if (!texto || typeof texto !== 'string') {
+      throw new BadRequestException('texto requerido');
+    }
+    if (!usuario || !usuario.userId) {
+      throw new BadRequestException('usuario requerido');
+    }
+
+    let objectId: Types.ObjectId;
+    try {
+      objectId = new Types.ObjectId(publicacionId);
+    } catch {
+      throw new BadRequestException('ID de publicación inválido');
+    }
+
+    const publicacion = await this.publicacionModel.findOne({
+      _id: objectId,
+      eliminado: { $ne: true },
+    });
+    if (!publicacion) throw new NotFoundException('La publicación no existe');
+
+    publicacion.comentarios.push({
+      usuario,
+      texto,
+      modificado: false,
+      created_at: new Date(),
+    } as any);
+
+    const guardado = await publicacion.save();
+    // Devolver solo el comentario recién agregado
+    const comentarioNuevo = guardado.comentarios[guardado.comentarios.length - 1];
+    return comentarioNuevo;
+  }
+
+  async editarComentario(
+    publicacionId: string,
+    comentarioId: string,
+    texto: string,
+  ) {
+    if (!texto || typeof texto !== 'string') {
+      throw new BadRequestException('texto requerido');
+    }
+    if (!comentarioId) {
+      throw new BadRequestException('comentarioId requerido');
+    }
+
+    let objectId: Types.ObjectId;
+    try {
+      objectId = new Types.ObjectId(publicacionId);
+    } catch {
+      throw new BadRequestException('ID de publicación inválido');
+    }
+
+    const publicacion = await this.publicacionModel.findOne({
+      _id: objectId,
+      eliminado: { $ne: true },
+    });
+    if (!publicacion) throw new NotFoundException('La publicación no existe');
+
+    const idx = publicacion.comentarios.findIndex(
+      (c: any) => String(c._id) === String(comentarioId),
+    );
+    if (idx === -1) {
+      throw new NotFoundException('Comentario no encontrado');
+    }
+
+    publicacion.comentarios[idx].texto = texto;
+    publicacion.comentarios[idx].modificado = true;
+
+    const guardado = await publicacion.save();
+    return guardado.comentarios[idx];
   }
   async findAllComments(userId: string, desde?: string, hasta?: string) {
     try {
@@ -218,11 +322,8 @@ export class PublicacionesService {
 
   async findOne(id: string) {
     try {
-      const porId = await this.publicacionModel.findOne({
-        _id: id,
-        eliminado: { $ne: true },
-      });
-      if (!porId) {
+      const porId = await this.publicacionModel.findById(id).exec();
+      if (!porId || porId.eliminado) {
         throw new NotFoundException('La publicación no existe');
       }
       return porId;

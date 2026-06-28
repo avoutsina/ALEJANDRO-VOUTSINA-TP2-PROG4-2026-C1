@@ -1,18 +1,19 @@
 import {
   BadRequestException,
-  Controller,
-  Get,
-  Post,
   Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
   Patch,
   Param,
-  Delete,
-  UseGuards,
-  Req,
+  Post,
+  Put,
   Query,
+  Req,
+  UseGuards,
   UseInterceptors,
   UploadedFile,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacioneDto } from './dto/create-publicaciones.dto';
@@ -68,6 +69,11 @@ export class PublicacionesController {
     return this.publicacionesService.create(publicacion);
   }
 
+  @Get('publicacion/:id')
+  findOne(@Param('id') id: string) {
+    return this.publicacionesService.findOne(id);
+  }
+
   @Get('inicio')
   findAll(
     @Query('sort') sort?: string,
@@ -94,6 +100,15 @@ export class PublicacionesController {
     return this.publicacionesService.findAllMe(userId, pagina);
   }
 
+  @Get('comentarios/usuarios/:id')
+  findAllComments(
+    @Param('id') userId: string,
+    @Query('desde') desde: string,
+    @Query('hasta') hasta: string,
+  ) {
+    return this.publicacionesService.findAllComments(userId, desde, hasta);
+  }
+
   @Get('comentarios/:id')
   findComments(
     @Param('id') publicacionId: string,
@@ -102,13 +117,25 @@ export class PublicacionesController {
     return this.publicacionesService.findComments(publicacionId, pagina);
   }
 
-  @Get('comentarios/usuarios/:id')
-  findAllComments(
-    @Param('id') userId: string,
-    @Query('desde') desde: string,
-    @Query('hasta') hasta: string,
+  @Post('comentarios/:id')
+  addComment(
+    @Param('id') publicacionId: string,
+    @Body() body: { texto: string; usuario: any },
   ) {
-    return this.publicacionesService.findAllComments(userId, desde, hasta);
+    return this.publicacionesService.addComentario(publicacionId, body);
+  }
+
+  @Put('comentarios/:id/:comentarioId')
+  editComment(
+    @Param('id') publicacionId: string,
+    @Param('comentarioId') comentarioId: string,
+    @Body() body: { texto: string },
+  ) {
+    return this.publicacionesService.editarComentario(
+      publicacionId,
+      comentarioId,
+      body.texto,
+    );
   }
 
   @Patch('perfil/modificar/:id')

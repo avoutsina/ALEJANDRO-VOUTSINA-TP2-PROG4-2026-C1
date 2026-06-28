@@ -2,7 +2,6 @@ import { Component, inject, signal, WritableSignal} from '@angular/core';
 import { PublicacionesUsuario } from '../../services/publicacionesUsuario';
 import { Comentario, PublicacionM } from '../../interfaces/publicacion';
 import { DatePipe, TitleCasePipe } from '@angular/common';
-import { ModificarPublicacion } from '../../Classes/modificar-publicacion';
 import { Auth } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { Loading } from '../components/loading/loading';
@@ -30,7 +29,7 @@ export class Inicio
   hayMasPublicaciones = signal<boolean>(true);
   offset: number = 0;
 
-  modificarPublicacion : ModificarPublicacion = new ModificarPublicacion();
+  modificarPublicacion : any = null; // Kept for template compatibility, not used
 
   mostrarComentarios = signal<string | null>(null);
   paginaActualComentarios : number = 1;
@@ -99,7 +98,26 @@ export class Inicio
 
   likearPublicacion(publicacion: Partial<PublicacionM>)
   {
-    this.modificarPublicacion.likearPublicacion(publicacion, this.publicaciones);
+    if (!publicacion._id) return;
+    const userId = this.authService.getSub;
+    if (!userId) return;
+
+    const meGustaId = publicacion.meGustaId ?? [];
+    const yaDioLike = meGustaId.includes(userId);
+    const request = yaDioLike
+      ? this.publicacionService.quitarLike(publicacion._id)
+      : this.publicacionService.darLike(publicacion._id);
+
+    request.subscribe({
+      next: (pubActualizada) => {
+        this.publicaciones.update(lista =>
+          lista.map(p => p._id === pubActualizada._id
+            ? { ...p, meGusta: pubActualizada.meGusta, meGustaId: pubActualizada.meGustaId }
+            : p
+          )
+        );
+      }
+    });
   }
 
   eliminarPublicacion(id: string)
@@ -161,11 +179,12 @@ export class Inicio
     ({
       next: (res) =>
       {
-        if (res.length < 6) this.hayMasComentarios.set(false);
+        const lista = res.comentarios;
+        if (lista.length < 6) this.hayMasComentarios.set(false);
         if (this.paginaActualComentarios === 1)
-          this.comentarios.set(res);
+          this.comentarios.set(lista);
         else
-          this.comentarios.update(valores => [...valores, ...res]);
+          this.comentarios.update(valores => [...valores, ...lista]);
       },
       error: (error) =>
       {
@@ -204,23 +223,27 @@ export class Inicio
   ///////////////COMENTARIO EDICION///////////////
   enviarComentario(publicacion: Partial<PublicacionM>)
   {
-    if(this.comentario() !== "" && publicacion._id)
-    {
-      if(!this.authService.getSub) return;
-      this.modificarPublicacion.enviarComentario
-      (
-        this.comentario(),
-        { userId: this.getSub, avatar: this.getAvatar, nombreUsuario: this.getNombreUsuario },
-        publicacion
-      );
-      const comentario =
+    const texto = this.comentario().trim();
+    if(!texto || !publicacion._id) return;
+    if(!this.authService.getSub) return;
+
+    const usuario = {
+      userId: this.getSub,
+      avatar: this.getAvatar,
+      nombreUsuario: this.getNombreUsuario
+    };
+
+    this.publicacionService.agregarComentario(publicacion._id, texto, usuario).subscribe({
+      next: (comentarioNuevo) =>
       {
-        usuario: { userId: this.getSub, avatar: this.getAvatar, nombreUsuario: this.getNombreUsuario },
-        texto: this.comentario()
-      };
-      this.comentarios.update(lista => [...lista, comentario]);
-      this.comentario.set("");
-    }
+        this.comentarios.update(lista => [comentarioNuevo, ...lista]);
+        this.comentario.set("");
+      },
+      error: (err) =>
+      {
+        Swal.fire({ title: err.error?.message ?? 'Error al comentar', icon: 'error', draggable: true });
+      }
+    });
   }
 
   editarComentario(comentarioPublicado: Comentario)
@@ -238,22 +261,27 @@ export class Inicio
 
   guardarEdicion(publicacion: PublicacionM)
   {
-    this.comentarios.update(lista =>
-      lista.map(c =>
-        c._id === this.comentarioPublicado!._id ? { ...c, texto: this.comentario() } : c
-      )
-    );
-    if(!this.comentarioPublicado || this.comentario() === "" || this.comentario() === this.comentarioPublicado.texto) return;
-    this.modificarPublicacion.editarComentario(this.comentarioPublicado, publicacion, this.comentario())?.subscribe({
-      next: (res) => { console.log(res); },
-      error: (error) => {
-        const err = error.error?.message;
-        Swal.fire({ title: err, icon: "error", draggable: true });
-      },
-      complete: () =>
+    if(!this.comentarioPublicado || !this.comentarioPublicado._id || this.comentario() === "" || this.comentario() === this.comentarioPublicado.texto) return;
+
+    const textoNuevo = this.comentario();
+    this.publicacionService.editarComentario(publicacion._id, this.comentarioPublicado._id!, textoNuevo).subscribe({
+      next: (comentarioActualizado) =>
       {
+        this.comentarios.update(lista =>
+          lista.map(c =>
+            c._id === comentarioActualizado._id
+              ? { ...c, texto: comentarioActualizado.texto, modificado: true }
+              : c
+          )
+        );
         this.comentario.set("");
         this.editando.set(false);
+        this.comentarioPublicado = undefined;
+      },
+      error: (error) =>
+      {
+        const err = error.error?.message;
+        Swal.fire({ title: err, icon: "error", draggable: true });
       }
     });
   }

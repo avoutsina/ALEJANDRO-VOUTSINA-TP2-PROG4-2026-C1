@@ -1,0 +1,137 @@
+<div class="detalle-page">
+  @if (cargando()) {
+    <div class="loading-center">
+      <app-loading></app-loading>
+    </div>
+  } @else if (publicacion()) {
+    <div class="detalle-layout">
+
+      <!-- Botón volver -->
+      <button class="btn-volver" routerLink="/inicio">
+        <span>&#8592;</span> Volver
+      </button>
+
+      <!-- Card publicación -->
+      <div class="pub-card">
+        <!-- Header -->
+        <div class="pub-header">
+          <div class="pub-autor" [routerLink]="['/perfil', publicacion()!.userId]">
+            @if (publicacion()!.avatar) {
+              <img [src]="publicacion()!.avatar" alt="avatar" class="avatar-img" />
+            } @else {
+              <img src="/assets/User.svg" alt="avatar" class="avatar-img avatar-default" />
+            }
+            <div>
+              <span class="autor-nombre">{{ publicacion()!.nombreUsuario | titlecase }}</span>
+              <span class="pub-fecha">{{ publicacion()!.created_at | date:'dd MMM yyyy, h:mm a' }}</span>
+            </div>
+          </div>
+          <div class="pub-stats">
+            <span class="stat-badge">❤️ {{ publicacion()!.meGusta }}</span>
+            <span class="stat-badge">💬 {{ totalComentarios }}</span>
+          </div>
+        </div>
+
+        <!-- Título -->
+        <h1 class="pub-titulo">{{ publicacion()!.titulo }}</h1>
+
+        <!-- Imagen grande -->
+        @if (publicacion()!.urlImg) {
+          <div class="pub-imagen-container">
+            <img [src]="publicacion()!.urlImg" alt="imagen publicación" class="pub-imagen" />
+          </div>
+        }
+
+        <!-- Descripción -->
+        @if (publicacion()!.descripcion) {
+          <p class="pub-descripcion">{{ publicacion()!.descripcion }}</p>
+        }
+      </div>
+
+      <!-- Sección comentarios -->
+      <div class="comentarios-section">
+        <h2 class="comentarios-titulo">Comentarios <span class="badge-total">{{ totalComentarios }}</span></h2>
+
+        <!-- Input escribir / editar comentario -->
+        <div class="input-comentario">
+          @if (getAvatar) {
+            <img [src]="getAvatar" alt="mi avatar" class="avatar-small" />
+          } @else {
+            <img src="/assets/User.svg" alt="avatar" class="avatar-small" />
+          }
+          <div class="input-wrapper">
+            <input
+              id="input-nuevo-comentario"
+              type="text"
+              class="comentario-input"
+              [placeholder]="editando() ? 'Editando comentario...' : 'Escribe un comentario...'"
+              [(ngModel)]="nuevoComentario"
+              (keydown.enter)="editando() ? guardarEdicion() : enviarComentario()"
+            />
+            <div class="input-acciones">
+              @if (editando()) {
+                <button class="btn-accion btn-cancelar" (click)="cancelarEdicion()" title="Cancelar">✕</button>
+                <button class="btn-accion btn-guardar" (click)="guardarEdicion()" title="Guardar">✓</button>
+              } @else {
+                <button class="btn-accion btn-enviar" (click)="enviarComentario()" title="Enviar">➤</button>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (editando()) {
+          <p class="editando-aviso">✏️ Editando tu comentario — presioná ✓ para guardar o ✕ para cancelar</p>
+        }
+
+        <!-- Lista de comentarios -->
+        <div class="comentarios-lista">
+          @for (comentario of comentarios(); track comentario._id) {
+            <div class="comentario-item">
+              <div class="comentario-avatar">
+                @if (comentario.usuario.avatar) {
+                  <img [src]="comentario.usuario.avatar" alt="avatar" class="avatar-small" />
+                } @else {
+                  <img src="/assets/User.svg" alt="avatar" class="avatar-small" />
+                }
+              </div>
+              <div class="comentario-body">
+                <div class="comentario-meta">
+                  <span class="comentario-autor">{{ comentario.usuario.nombreUsuario }}</span>
+                  @if (comentario.created_at) {
+                    <span class="comentario-fecha">{{ comentario.created_at | date:'dd/MM/yyyy' }}</span>
+                  }
+                  @if (comentario.modificado) {
+                    <span class="badge-editado">editado</span>
+                  }
+                </div>
+                <p class="comentario-texto">{{ comentario.texto }}</p>
+              </div>
+              @if (comentario.usuario.userId === getSub) {
+                <button class="btn-editar-comentario" (click)="iniciarEdicion(comentario)" title="Editar">
+                  <img src="/assets/Editar.svg" alt="editar" width="18px" />
+                </button>
+              }
+            </div>
+          }
+
+          @if (comentarios().length === 0 && !cargandoComentarios()) {
+            <p class="sin-comentarios">Sé el primero en comentar 👇</p>
+          }
+        </div>
+
+        <!-- Cargar más -->
+        @if (hayMasComentarios() && !cargandoComentarios()) {
+          <div class="cargar-mas-container">
+            <button class="btn-cargar-mas" (click)="cargarMasComentarios()">Cargar más comentarios</button>
+          </div>
+        }
+        @if (cargandoComentarios()) {
+          <div class="loading-center mt-3">
+            <app-loading></app-loading>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+</div>
