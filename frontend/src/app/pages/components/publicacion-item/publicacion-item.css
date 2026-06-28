@@ -206,16 +206,22 @@
     vertical-align: middle;
 }
 
-/* Link a detalle de publicación */
+/* Botón "Ver publicación" con marco */
 .link-detalle {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.45);
+    font-size: 0.8rem;
+    color: #fff;
     cursor: pointer;
     text-decoration: none;
-    transition: color 0.2s;
-    padding: 2px 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 4px 10px;
+    transition: all 0.2s ease-in-out;
 }
 .link-detalle:hover {
-    color: rgba(124, 106, 255, 0.9);
-    text-decoration: underline;
+    color: #fff;
+    background-color: #d47100b9;
+    border-color: #d47100;
+    text-decoration: none;
+    transform: scale(1.03);
 }
