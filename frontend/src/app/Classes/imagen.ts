@@ -14,19 +14,14 @@ export class imagen {
     this.reviewUrl = url;
   }
 
-  /**
-   * Supabase/Supa eliminado.
-   * El upload de la imagen debe hacerse desde el backend (Cloudinary) o con el flujo que ya usa Auth.register.
-   */
+
   async upload(_url: string | null) {
     throw new Error(
       'Supabase eliminado: no se usa imagen.upload(). Usa Auth.register con FormData.',
     );
   }
 
-  /**
-   * Supabase/Supa eliminado.
-   */
+ 
   async delete() {
     throw new Error('Supabase eliminado: no se usa imagen.delete().');
   }
