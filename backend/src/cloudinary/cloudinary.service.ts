@@ -60,4 +60,6 @@ export class CloudinaryService {
       reject(new Error('No file content available for upload.'));
     });
   }
+
+  // No cleanup methods are currently used for Cloudinary deletion in this project.
 }

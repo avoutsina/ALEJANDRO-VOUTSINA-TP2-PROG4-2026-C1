@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacioneDto } from './dto/create-publicaciones.dto';
 import { UpdatePublicacioneDto } from './dto/update-publicaciones.dto';
@@ -9,102 +24,129 @@ import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 
 @UseGuards(AuthGuard)
 @Controller()
-export class PublicacionesController
-{
+export class PublicacionesController {
   constructor(
     private readonly publicacionesService: PublicacionesService,
-    private readonly cloudinaryService: CloudinaryService
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
-  
-  @Post("perfil/crear")
+
+  @Post('perfil/crear')
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   async create(
-    @Body() createPublicacioneDto: CreatePublicacioneDto,
-    @UploadedFile() file?: Express.Multer.File
-  )
-  {
+    @Req() req: any,
+    @Body() body: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const user = req.user || {};
+    if (!user.sub || !user.userName) {
+      throw new BadRequestException('Token inválido o incompleto');
+    }
+
+    const publicacion: CreatePublicacioneDto = {
+      titulo: body.titulo,
+      userId: user.sub,
+      urlImg: '',
+      descripcion: body.descripcion ?? '',
+      nombreUsuario: user.userName,
+      avatar: user.avatar ?? '',
+      meGusta: 0,
+      meGustaId: [],
+      comentarios: [],
+    };
+
     if (file) {
-      const uploadResult = await this.cloudinaryService.uploadImage(file, 'publicaciones');
+      const uploadResult = await this.cloudinaryService.uploadImage(
+        file,
+        'publicaciones',
+      );
       if (uploadResult?.secure_url) {
-        createPublicacioneDto.urlImg = uploadResult.secure_url;
+        publicacion.urlImg = uploadResult.secure_url;
+        publicacion.publicId = uploadResult.public_id;
       }
     }
-    return this.publicacionesService.create(createPublicacioneDto);
+
+    return this.publicacionesService.create(publicacion);
   }
 
-  @Get("inicio")
+  @Get('inicio')
   findAll(
-    @Query("sort") sort?: string,
-    @Query("userId") userId?: string,
-    @Query("offset") offset?: string,
-    @Query("limit") limit?: string
-  )
-  {
+    @Query('sort') sort?: string,
+    @Query('userId') userId?: string,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ) {
     const off = offset !== undefined ? Number(offset) : undefined;
     const lim = limit !== undefined ? Number(limit) : undefined;
     return this.publicacionesService.findAll(sort, userId, off, lim);
   }
 
-  @Get("publicaciones/:id")
-  countByUserAndDate(@Param("id") id: string, @Query("desde") desde?: string, @Query("hasta") hasta?: string) 
-  {
+  @Get('publicaciones/:id')
+  countByUserAndDate(
+    @Param('id') id: string,
+    @Query('desde') desde?: string,
+    @Query('hasta') hasta?: string,
+  ) {
     return this.publicacionesService.findAllMeCount(id, desde, hasta);
   }
 
-  @Get("perfil/:id")
-  findAllMe(@Param("id") userId: string, @Query("pagina") pagina: number)
-  {
+  @Get('perfil/:id')
+  findAllMe(@Param('id') userId: string, @Query('pagina') pagina: number) {
     return this.publicacionesService.findAllMe(userId, pagina);
   }
 
-  @Get("comentarios/:id")
-  findComments(@Param('id') publicacionId: string, @Query("pagina") pagina: number)
-  {
+  @Get('comentarios/:id')
+  findComments(
+    @Param('id') publicacionId: string,
+    @Query('pagina') pagina: number,
+  ) {
     return this.publicacionesService.findComments(publicacionId, pagina);
   }
 
-  @Get("comentarios/usuarios/:id")
-  findAllComments(@Param('id') userId: string, @Query("desde") desde: string, @Query("hasta") hasta: string)
-  {
+  @Get('comentarios/usuarios/:id')
+  findAllComments(
+    @Param('id') userId: string,
+    @Query('desde') desde: string,
+    @Query('hasta') hasta: string,
+  ) {
     return this.publicacionesService.findAllComments(userId, desde, hasta);
   }
 
-  @Patch("perfil/modificar/:id")
-  update(@Param('id') id: string, @Body() updatePublicacioneDto: UpdatePublicacioneDto)
-  {
+  @Patch('perfil/modificar/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updatePublicacioneDto: UpdatePublicacioneDto,
+  ) {
     return this.publicacionesService.update(id, updatePublicacioneDto);
   }
 
-  @Delete("perfil/eliminar/:id")
-  async remove(@Param('id') id: string, @Req() req: any)
-  {
+  @Delete('perfil/eliminar/:id')
+  async remove(@Param('id') id: string, @Req() req: any) {
     const userId = req.user?.sub;
     const isAdmin = req.user?.admin;
 
     const publicacion = await this.publicacionesService.findOne(id);
     if (publicacion.userId !== userId && !isAdmin) {
-      throw new ForbiddenException("No tienes permisos para eliminar esta publicación");
+      throw new ForbiddenException(
+        'No tienes permisos para eliminar esta publicación',
+      );
     }
 
     return this.publicacionesService.remove(id);
   }
 
-  @Delete("publicaciones/eliminar/:userId")
-  removeAll(@Param('userId') userId: string)
-  {
+  @Delete('publicaciones/eliminar/:userId')
+  removeAll(@Param('userId') userId: string) {
     return this.publicacionesService.removeAll(userId);
   }
 
-  @Post("publicaciones/:id/like")
-  like(@Param('id') id: string, @Req() req: any)
-  {
+  @Post('publicaciones/:id/like')
+  like(@Param('id') id: string, @Req() req: any) {
     const userId = req.user?.sub;
     return this.publicacionesService.likePublicacion(id, userId);
   }
 
-  @Delete("publicaciones/:id/like")
-  unlike(@Param('id') id: string, @Req() req: any)
-  {
+  @Delete('publicaciones/:id/like')
+  unlike(@Param('id') id: string, @Req() req: any) {
     const userId = req.user?.sub;
     return this.publicacionesService.unlikePublicacion(id, userId);
   }

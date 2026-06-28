@@ -17,7 +17,6 @@ import Swal from 'sweetalert2';
 })
 export class PublicacionItemComponent {
   @Input() publicacion!: PublicacionM;
-  @Input() mostrarComentariosPorDefecto: boolean = false;
   @Output() eliminar = new EventEmitter<string>();
   @Output() verImagen = new EventEmitter<PublicacionM>();
 
@@ -27,21 +26,6 @@ export class PublicacionItemComponent {
   modificarPublicacion = new ModificarPublicacion();
 
   mostrarComentarios = signal<boolean>(false);
-  // Precarga comentarios (página 1) cuando la vista padre lo requiera (ej: Mi Perfil)
-  ngOnChanges(): void {
-    if (this.mostrarComentariosPorDefecto && this.publicacion?._id && !this.mostrarComentarios()) {
-      this.editando.set(false);
-      this.comentarioPublicado = undefined;
-      this.comentario.set('');
-      this.hayMasComentarios.set(true);
-      this.cargandoComentarios.set(false);
-
-      this.mostrarComentarios.set(true);
-      this.paginaActualComentarios = 1;
-      this.comentarios.set([]);
-      this.traerComentarios();
-    }
-  }
   paginaActualComentarios = 1;
   comentarios = signal<Comentario[]>([]);
   hayMasComentarios = signal<boolean>(true);
@@ -65,10 +49,28 @@ export class PublicacionItemComponent {
   }
 
   likear() {
-    // Para actualizar la lista de likes en el padre o localmente.
-    // Creamos un WritableSignal local/falso o pasamos la lógica
-    const localSignal = signal<PublicacionM[]>([this.publicacion]);
-    this.modificarPublicacion.likearPublicacion(this.publicacion, localSignal);
+    if (!this.publicacion?._id) return;
+    const userId = this.authService.getSub;
+    if (!userId) return;
+
+    const yaDioLike = this.publicacion.meGustaId?.includes(userId);
+    const request = yaDioLike
+      ? this.publicacionService.quitarLike(this.publicacion._id)
+      : this.publicacionService.darLike(this.publicacion._id);
+
+    request.subscribe({
+      next: (res) => {
+        this.publicacion = {
+          ...this.publicacion,
+          meGusta: res.meGusta,
+          meGustaId: res.meGustaId,
+        };
+      },
+      error: (error) => {
+        const err = error.error?.message ?? 'Error al actualizar like';
+        Swal.fire({ title: err, icon: 'error', draggable: true });
+      },
+    });
   }
 
   eliminarPublicacion() {

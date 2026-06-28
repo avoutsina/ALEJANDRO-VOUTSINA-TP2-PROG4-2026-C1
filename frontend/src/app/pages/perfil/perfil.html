@@ -1,6 +1,8 @@
 @if (!this.cargando()) {
+  <!-- SECCIÓN: Datos del usuario -->
   <div class="container-perfil-usuario py-4 px-3 mb-4">
     <div class="d-flex align-items-center gap-4 flex-wrap">
+      <!-- Avatar grande -->
       @if (
         (this.seleccionoUsuario() && this.usuario()?.avatar) ||
         (!this.seleccionoUsuario() && this.getAvatar)
@@ -17,7 +19,8 @@
         </div>
       }
 
-      <div class="d-flex flex-column gap-1">
+      <!-- Información del usuario -->
+      <div class="d-flex flex-column gap-1 info-perfil">
         <h2 class="m-0">
           {{
             (this.seleccionoUsuario() ? this.usuario()?.nombreUsuario : this.getNombreUsuario)
@@ -25,10 +28,24 @@
           }}
         </h2>
 
-        @if (!this.seleccionoUsuario()) {
-          <p class="m-0 text-muted">
-            <strong>Nombre:</strong>
-            {{ this.getNombreUsuario }}
+        @if (this.usuario()?.nombre) {
+          <p class="m-0"><strong>Nombre:</strong> {{ this.usuario()?.nombre }}</p>
+        } @else {
+          <p class="m-0"><strong>Nombre:</strong> {{ this.getNombreUsuario }}</p>
+        }
+
+        @if (this.usuario()?.apellido) {
+          <p class="m-0"><strong>Apellido:</strong> {{ this.usuario()?.apellido }}</p>
+        }
+
+        @if (this.usuario()?.correo) {
+          <p class="m-0"><strong>Email:</strong> {{ this.usuario()?.correo }}</p>
+        }
+
+        @if (this.usuario()?.fechaDeNacimiento) {
+          <p class="m-0">
+            <strong>Fecha de nacimiento:</strong>
+            {{ this.usuario()?.fechaDeNacimiento | date: 'dd/MM/yyyy' }}
           </p>
         }
 
@@ -37,21 +54,24 @@
             <em>{{ this.usuario()?.descripcion }}</em>
           </p>
         }
+
         @if (!this.seleccionoUsuario()) {
-          <p class="m-0 text-muted">
+          <p class="m-0">
             <strong>Rol:</strong> {{ this.getPermiso ? 'Administrador' : 'Usuario' }}
           </p>
         }
       </div>
 
+      <!-- Botón editar solo si es tu propio perfil -->
       @if (!this.seleccionoUsuario()) {
         <div class="ms-auto">
-          <h5 class="text-muted m-0">TU PERFIL</h5>
+          <h5 class="perfil-titulo m-0">TU PERFIL</h5>
         </div>
       }
     </div>
   </div>
 
+  <!-- Título sección publicaciones -->
   <div class="margen">
     <h3 class="mb-3">
       {{
@@ -62,13 +82,12 @@
     </h3>
 
     @if (misPublicaciones().length > 0) {
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 container-cards mb-5">
+      <div class="container-cards mb-5">
         @for (publicacion of misPublicaciones(); track publicacion._id) {
-          <div class="col d-flex">
+          <div class="publicacion-vertical d-flex w-100">
             <app-publicacion-item
               class="w-100"
               [publicacion]="publicacion"
-              [mostrarComentariosPorDefecto]="true"
               (eliminar)="removerPublicacionDeLista($event)"
               (verImagen)="verImagen($event)"
             >
@@ -83,6 +102,7 @@
         </div>
       }
 
+      <!-- Vista previa imagen + comentarios completos -->
       @if (mostrarVistaPrevia()) {
         <div class="container-overlay d-flex justify-content-center align-items-center">
           <div class="container-preview-overlay d-flex flex-column align-items-center p-4 gap-3">
@@ -157,6 +177,7 @@
                   }
                 </div>
 
+                <!-- Input comentario -->
                 <div class="d-flex align-items-center gap-2 mt-2 container-input-comentario">
                   <div class="view avatar-input">
                     @if (getAvatar) {

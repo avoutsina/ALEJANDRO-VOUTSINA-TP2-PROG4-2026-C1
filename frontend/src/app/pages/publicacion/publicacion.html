@@ -1,74 +1,94 @@
 <div class="pb-5 pt-4">
-    <h1 class="text-center titulo">CREAR PUBLICACIÓN</h1>
+  <div class="page-header-publicacion">
+    <h1 class="text-center titulo mb-0">CREAR PUBLICACIÓN</h1>
+    <button
+      type="button"
+      class="btn btn-primary btn-sm nueva-publicacion-btn"
+      (click)="nuevaPublicacion()"
+    >
+      Nueva publicación
+    </button>
+  </div>
 </div>
 <div class="container mb-5">
-    <div class="d-flex justify-content-center">
-        <div class="d-flex justify-content-center containerPubli">
-            <form [formGroup]="fomularioPublicacion" class="d-grid gap-5" (ngSubmit)="crearPublicacion()">
-                <div class="d-flex gap-2">
-                    <div>
-                        <input type="file" hidden #agregarImagen accept="image/*" (change)="onArchivoSeleccionado($event)">
-                        <div class="container-image d-flex align-center text-center">
-                            @if (reviewUrl)
-                            {
-                                <img [src]="reviewUrl" alt="imagen" class="review">
-                            }
-                            @else
-                            {
-                                <div class="container-subir">
-                                    <img src="/assets/Imagen.svg" alt="subir" (click)="agregarImagen.click()" class="boton-subir">
-                                    <label class="fs-5">Seleccionar imagen desde mi computadora</label>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <div>
-                        <div class="p-4">
-                            <div class="mb-3">
-                                <h4>{{getNombreUsuario | uppercase}} </h4>
-                            </div>
-
-                            <h6 class="fs-5 mb-1">Título <span class="text-danger">*</span></h6>
-                            <input
-                                formControlName="titulo"
-                                class="form-control mb-1"
-                                type="text"
-                                placeholder="Escribe un título..."
-                                maxlength="80"
-                            >
-                            @if(getTitulo.errors?.['required'] && getTitulo.touched)
-                            {
-                                <small class="error">El título es requerido</small>
-                            }
-                            @if(getTitulo.errors?.['minlength'] && getTitulo.touched)
-                            {
-                                <small class="error">Mínimo 3 caracteres</small>
-                            }
-
-                            <h6 class="fs-5 mb-1 mt-3">Descripción</h6>
-                            <textarea
-                                formControlName="descripcion"
-                                class="form-control descripcion-box mb-1"
-                                rows="4"
-                                placeholder="Escribí una descripción..."
-                            ></textarea>
-                            
-                            @if(getDescripcion.errors?.['maxlength'] && getDescripcion.touched)
-                            {
-                                <small class="error">Máximo 100 caracteres</small>
-                            }
-                        </div>
-                        <div class="d-grid gap-3">
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-secondary fs-5" [disabled]="!this.fomularioPublicacion.valid">Publicar</button>
-                            </div>
-                            <div class="text-center">
-                                <button class="btn btn-secondary fs-6 boton" routerLink="/perfil">Volver</button>
-                            </div>
-                        </div>
-                    </div>
+  <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center containerPubli">
+      <form [formGroup]="fomularioPublicacion" class="d-grid gap-5" (ngSubmit)="crearPublicacion()">
+        <div class="d-flex gap-2">
+          <div>
+            <input
+              type="file"
+              hidden
+              #agregarImagen
+              accept="image/*"
+              (change)="onArchivoSeleccionado($event)"
+            />
+            <div class="container-image d-flex align-center text-center">
+              @if (reviewUrl) {
+                <img [src]="reviewUrl" alt="imagen" class="review" />
+              } @else {
+                <div class="container-subir">
+                  <img
+                    src="/assets/Imagen.svg"
+                    alt="subir"
+                    (click)="agregarImagen.click()"
+                    class="boton-subir"
+                  />
+                  <label class="fs-5">Seleccionar imagen desde mi computadora</label>
                 </div>
-            </form>
+              }
+            </div>
+          </div>
+          <div>
+            <div class="p-4">
+              <div class="mb-3">
+                <h4>{{ getNombreUsuario | uppercase }}</h4>
+              </div>
+
+              <h6 class="fs-5 mb-1">Título <span class="text-danger">*</span></h6>
+              <input
+                formControlName="titulo"
+                class="form-control mb-1"
+                type="text"
+                placeholder="Escribe un título..."
+                maxlength="80"
+              />
+              @if (getTitulo.errors?.['required'] && getTitulo.touched) {
+                <small class="error">El título es requerido</small>
+              }
+              @if (getTitulo.errors?.['minlength'] && getTitulo.touched) {
+                <small class="error">Mínimo 3 caracteres</small>
+              }
+
+              <h6 class="fs-5 mb-1 mt-3">Descripción</h6>
+              <textarea
+                formControlName="descripcion"
+                class="form-control descripcion-box mb-1"
+                rows="4"
+                placeholder="Escribí una descripción..."
+              ></textarea>
+
+              @if (getDescripcion.errors?.['maxlength'] && getDescripcion.touched) {
+                <small class="error">Máximo 100 caracteres</small>
+              }
+            </div>
+            <div class="d-grid gap-3">
+              <div class="text-center">
+                <button
+                  type="submit"
+                  class="btn btn-secondary fs-5"
+                  [disabled]="!this.fomularioPublicacion.valid"
+                >
+                  Publicar
+                </button>
+              </div>
+              <div class="text-center">
+                <button class="btn btn-secondary fs-6 boton" routerLink="/perfil">Volver</button>
+              </div>
+            </div>
+          </div>
         </div>
+      </form>
     </div>
+  </div>
 </div>

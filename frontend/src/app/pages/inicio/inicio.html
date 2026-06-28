@@ -1,87 +1,85 @@
-@if(!this.cargando())
-{
-    <div class="d-flex gap-3 container-ordenar pt-4">
-        <label for="ordenar" class="mt-1">Ordenar por</label>
-        <select id="ordenar" class="p-2" [(ngModel)]="ordenar" (change)="selecciono()">
-            <option value="fecha">Fecha</option>
-            <option value="masLikes">Más Likes</option>
-            <option value="menosLikes">Menos Likes</option>
-        </select>
-    </div>
-    <div class="w-100 d-grid justify-content-center container-principal">
-        <div class="d-grid justify-content-center container-cards">
-            <div class="d-flex align-center justify-content-center mb-4 mt-3">
-                <h1>PUBLICACIONES</h1>
-            </div>
+@if (!this.cargando()) {
+  <div class="d-flex gap-3 container-ordenar pt-4">
+    <label for="ordenar" class="mt-1">Ordenar por</label>
+    <select id="ordenar" class="p-2" [(ngModel)]="ordenar" (change)="selecciono()">
+      <option value="fecha">Fecha</option>
+      <option value="masLikes">Más Likes</option>
+      <option value="menosLikes">Menos Likes</option>
+    </select>
+  </div>
+  <div class="w-100 d-grid justify-content-center container-principal">
+    <div class="d-grid justify-content-center container-cards">
+      <div class="d-flex align-center justify-content-between mb-4 mt-3 header-publicaciones">
+        <h1>PUBLICACIONES</h1>
+        <button class="btn btn-primary btn-sm boton-crear-publicacion" [routerLink]="['/crear']">
+          Nueva publicación
+        </button>
+      </div>
 
-            <!-- Traer todas las publicaciones -->
-            @for (publicacion of publicaciones(); track publicacion._id)
-            {
-                <app-publicacion-item 
-                    [publicacion]="publicacion"
-                    (eliminar)="removerPublicacionDeLista($event)"
-                    (verImagen)="verImagen($event)">
-                </app-publicacion-item>
-            }
+      <!-- Traer todas las publicaciones -->
+      @for (publicacion of publicaciones(); track publicacion._id) {
+        <app-publicacion-item
+          [publicacion]="publicacion"
+          (eliminar)="removerPublicacionDeLista($event)"
+          (verImagen)="verImagen($event)"
+        >
+        </app-publicacion-item>
+      }
 
-            <!-- Botón Cargar más publicaciones -->
-            @if(hayMasPublicaciones() && !cargandoMas())
-            {
-                <div class="d-flex justify-content-center mb-4">
-                    <button class="btn btn-secondary" (click)="cargarMasPublicaciones()">Cargar más</button>
-                </div>
-            }
-            @if(cargandoMas())
-            {
-                <div class="d-flex justify-content-center mb-4">
-                    <app-loading></app-loading>
-                </div>
-            }
-
-            <!-- Muestro imagen si presiono el botón de Ver imagen -->
-            @if(mostrarVistaPrevia())
-            {
-                <div class="container-overlay d-flex justify-content-center align-items-center">
-                    <div class="preview-overlay d-flex flex-column align-items-around p-4 gap-4 ">
-                        <div class="d-flex align-items-center gap-3 text-align-center justify-content-between">
-                            <!-- Si tiene avatar lo pongo si no uso el default -->
-                                <div class="d-flex align-items-center gap-3 text-align-center">
-                                    @if(this.publicacion?.avatar)
-                                    {
-                                        <div class="view">
-                                            <img [src]="this.publicacion?.avatar" alt="avatar">
-                                        </div>
-                                    }
-                                    @else
-                                    {
-                                        <div>
-                                            <img src="/assets/User.svg" alt="avatar" width="55px">
-                                        </div>
-                                    }
-                                    <!-- Pongo el nombre de usuario -->
-                                    <h4 class="m-0">{{this.publicacion?.nombreUsuario | titlecase}}</h4>
-                                </div>
-                            <div>
-                                <h5 class="m-0">{{this.publicacion?.created_at | date:'dd-MM-yyyy h:mm a' }}</h5>
-                            </div>
-                        </div>
-                        @if(this.publicacion?.titulo)
-                        {
-                            <h4 class="text-center m-0">{{ this.publicacion?.titulo }}</h4>
-                        }
-                        <div class="preview-content d-flex justify-content-center align-items-center">
-                            <img [src]="this.publicacion?.urlImg" alt="vista previa" class="preview-img">
-                        </div>
-                        <div class="d-flex flex-column gap-4">
-                            <button class="btn btn-secondary boton-vista-previa icono" (click)="cerrarVistaPrevia()">Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-            }
+      <!-- Botón Cargar más publicaciones -->
+      @if (hayMasPublicaciones() && !cargandoMas()) {
+        <div class="d-flex justify-content-center mb-4">
+          <button class="btn btn-secondary" (click)="cargarMasPublicaciones()">Cargar más</button>
         </div>
+      }
+      @if (cargandoMas()) {
+        <div class="d-flex justify-content-center mb-4">
+          <app-loading></app-loading>
+        </div>
+      }
+
+      <!-- Muestro imagen si presiono el botón de Ver imagen -->
+      @if (mostrarVistaPrevia()) {
+        <div class="container-overlay d-flex justify-content-center align-items-center">
+          <div class="preview-overlay d-flex flex-column align-items-around p-4 gap-4">
+            <div class="d-flex align-items-center gap-3 text-align-center justify-content-between">
+              <!-- Si tiene avatar lo pongo si no uso el default -->
+              <div class="d-flex align-items-center gap-3 text-align-center">
+                @if (this.publicacion?.avatar) {
+                  <div class="view">
+                    <img [src]="this.publicacion?.avatar" alt="avatar" />
+                  </div>
+                } @else {
+                  <div>
+                    <img src="/assets/User.svg" alt="avatar" width="55px" />
+                  </div>
+                }
+                <!-- Pongo el nombre de usuario -->
+                <h4 class="m-0">{{ this.publicacion?.nombreUsuario | titlecase }}</h4>
+              </div>
+              <div>
+                <h5 class="m-0">{{ this.publicacion?.created_at | date: 'dd-MM-yyyy h:mm a' }}</h5>
+              </div>
+            </div>
+            @if (this.publicacion?.titulo) {
+              <h4 class="text-center m-0">{{ this.publicacion?.titulo }}</h4>
+            }
+            <div class="preview-content d-flex justify-content-center align-items-center">
+              <img [src]="this.publicacion?.urlImg" alt="vista previa" class="preview-img" />
+            </div>
+            <div class="d-flex flex-column gap-4">
+              <button
+                class="btn btn-secondary boton-vista-previa icono"
+                (click)="cerrarVistaPrevia()"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
-}
-@else
-{
-    <app-loading></app-loading>
+  </div>
+} @else {
+  <app-loading></app-loading>
 }
