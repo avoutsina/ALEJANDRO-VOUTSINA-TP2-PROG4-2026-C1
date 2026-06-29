@@ -61,6 +61,11 @@ export class PublicacionesService {
     }
 
     const resultado = await this.publicacionModel.aggregate([
+      {
+        $addFields: {
+          created_at: { $toDate: '$created_at' }
+        }
+      },
       { $match: match },
 
       // Agrupamos por usuario
@@ -406,5 +411,140 @@ export class PublicacionesService {
     );
     publicacion.meGusta = publicacion.meGustaId.length;
     return await publicacion.save();
+  }
+
+  async getEstadisticasPublicaciones(desde?: string, hasta?: string) {
+    const match: any = { eliminado: { $ne: true } };
+    if (desde || hasta) {
+      match.created_at = {};
+      if (desde) match.created_at.$gte = new Date(desde);
+      if (hasta) {
+        const hastaDate = new Date(hasta);
+        hastaDate.setUTCHours(23, 59, 59, 999);
+        match.created_at.$lte = hastaDate;
+      }
+    }
+
+    return this.publicacionModel.aggregate([
+      {
+        $addFields: {
+          created_at: { $toDate: '$created_at' }
+        }
+      },
+      { $match: match },
+      {
+        $group: {
+          _id: '$userId',
+          nombreUsuario: { $first: '$nombreUsuario' },
+          cantidadPublicaciones: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: '$_id',
+          nombreUsuario: 1,
+          cantidadPublicaciones: 1,
+        },
+      },
+    ]);
+  }
+
+  async getEstadisticasComentariosTotales(desde?: string, hasta?: string) {
+    const match: any = { eliminado: { $ne: true } };
+    
+    // Filtro por fecha en base a comentarios creados en el rango
+    const matchComment: any = {};
+    if (desde || hasta) {
+      matchComment['comentarios.created_at'] = {};
+      if (desde) matchComment['comentarios.created_at'].$gte = new Date(desde);
+      if (hasta) {
+        const hastaDate = new Date(hasta);
+        hastaDate.setUTCHours(23, 59, 59, 999);
+        matchComment['comentarios.created_at'].$lte = hastaDate;
+      }
+    }
+
+    const pipeline: any[] = [
+      { $match: match },
+      { $unwind: '$comentarios' },
+      {
+        $addFields: {
+          'comentarios.created_at': { $toDate: '$comentarios.created_at' }
+        }
+      }
+    ];
+
+    if (desde || hasta) {
+      // Ajustar fechas a la zona horaria local (Buenos Aires) para coincidir correctamente con el filtro
+      const localMatch: any = {};
+      if (desde) {
+        const desdeDate = new Date(desde);
+        desdeDate.setUTCHours(3, 0, 0, 0); // Compensar la diferencia de zona horaria de Buenos Aires (-03:00) para iniciar el día local
+        localMatch['comentarios.created_at'] = { $gte: desdeDate };
+      }
+      if (hasta) {
+        const hastaDate = new Date(hasta);
+        hastaDate.setUTCHours(26, 59, 59, 999); // Sumar 23:59:59 más la compensación de 3 horas de Argentina
+        if (!localMatch['comentarios.created_at']) {
+          localMatch['comentarios.created_at'] = {};
+        }
+        localMatch['comentarios.created_at'].$lte = hastaDate;
+      }
+      pipeline.push({ $match: localMatch });
+    }
+    pipeline.push(
+      {
+        $group: {
+          _id: {
+            $dateToString: { 
+              format: '%d-%m-%Y', 
+              date: '$comentarios.created_at',
+              timezone: 'America/Argentina/Buenos_Aires'
+            }
+          },
+          cantidadComentarios: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          fecha: '$_id',
+          cantidadComentarios: 1
+        }
+      },
+      { $sort: { fecha: 1 } }
+    );
+
+    return this.publicacionModel.aggregate(pipeline);
+  }
+
+  async getEstadisticasComentariosPorPublicacion(desde?: string, hasta?: string) {
+    const match: any = { eliminado: { $ne: true } };
+    if (desde || hasta) {
+      match.created_at = {};
+      if (desde) match.created_at.$gte = new Date(desde);
+      if (hasta) {
+        const hastaDate = new Date(hasta);
+        hastaDate.setUTCHours(23, 59, 59, 999);
+        match.created_at.$lte = hastaDate;
+      }
+    }
+
+    return this.publicacionModel.aggregate([
+      {
+        $addFields: {
+          created_at: { $toDate: '$created_at' }
+        }
+      },
+      { $match: match },
+      {
+        $project: {
+          _id: 0,
+          titulo: 1,
+          cantidadComentarios: { $size: '$comentarios' }
+        }
+      }
+    ]);
   }
 }

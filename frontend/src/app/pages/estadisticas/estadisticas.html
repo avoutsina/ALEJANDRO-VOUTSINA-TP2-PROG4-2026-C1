@@ -5,49 +5,74 @@
             <h1>ESTADISTICAS</h1>
         </div>
     </div>
-    <div class="container-estadisticas d-flex align-items-center gap-5">
-        <div class="d-flex flex-column gap-4 align-items-start">
-            <h3 class="m-0">Cantidad de publicaciones por usuario</h3>
-            <h5 class="m-0">Elige un periodo</h5>
-            <div class="d-flex align-items-center justify-content-center gap-4">
+    <div class="container-estadisticas d-flex flex-column align-items-center gap-5 mt-4">
+        
+        <!-- Gráfico 1: Publicaciones por usuario (Barras) -->
+        <div class="d-flex flex-column gap-4 align-items-center w-75 p-4 border border-secondary rounded bg-dark">
+            <h3 class="m-0 text-white">Cantidad de publicaciones por usuario (Barras)</h3>
+            <h5 class="m-0 text-white-50">Elige un periodo</h5>
+            <div class="d-flex align-items-center justify-content-center gap-4 flex-wrap">
                 <div class="d-flex justify-content-center flex-column gap-1">
-                    <label for="desde" class="ms-2">Desde</label>
-                    <input type="date" id="desde" class="calendario" [ngModel]="desde()" (ngModelChange)="desde.set($event)"/>
+                    <label for="desde1" class="ms-2 text-white">Desde</label>
+                    <input type="date" id="desde1" class="calendario bg-secondary text-white border-0 p-2 rounded" [ngModel]="desde()" (ngModelChange)="desde.set($event)"/>
                 </div>
                 <div class="d-flex justify-content-center flex-column gap-1">
-                    <label for="hasta" class="ms-2">Hasta</label>
-                    <input type="date" id="hasta" class="calendario" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)"/>
+                    <label for="hasta1" class="ms-2 text-white">Hasta</label>
+                    <input type="date" id="hasta1" class="calendario bg-secondary text-white border-0 p-2 rounded" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)"/>
                 </div>
                 <div>
-                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticas()">Aplicar</button>
+                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticas1()">Aplicar</button>
                 </div>
             </div>
-            <div class="p-3 container-charts">
+            <div class="p-3 container-charts w-100" style="height: 350px;">
                 <canvas id="miChart"></canvas>
             </div>
         </div>
 
-
-        <div class="d-flex flex-column gap-4 align-items-start">
-            <h3 class="m-0">Cantidad de comentarios por dia</h3>
-            <h5 class="m-0">Elige un periodo</h5>
-            <div class="d-flex align-items-center justify-content-center gap-4">
+        <!-- Gráfico 2: Comentarios totales por día (Líneas) -->
+        <div class="d-flex flex-column gap-4 align-items-center w-75 p-4 border border-secondary rounded bg-dark">
+            <h3 class="m-0 text-white">Cantidad de comentarios por fecha (Líneas)</h3>
+            <h5 class="m-0 text-white-50">Elige un periodo</h5>
+            <div class="d-flex align-items-center justify-content-center gap-4 flex-wrap">
                 <div class="d-flex justify-content-center flex-column gap-1">
-                    <label for="desde" class="ms-2">Desde</label>
-                    <input type="date" id="desde" class="calendario" [ngModel]="desdeComentarios()" (ngModelChange)="desdeComentarios.set($event)"/>
+                    <label for="desde2" class="ms-2 text-white">Desde</label>
+                    <input type="date" id="desde2" class="calendario bg-secondary text-white border-0 p-2 rounded" [ngModel]="desdeComentarios()" (ngModelChange)="desdeComentarios.set($event)"/>
                 </div>
                 <div class="d-flex justify-content-center flex-column gap-1">
-                    <label for="hasta" class="ms-2">Hasta</label>
-                    <input type="date" id="hasta" class="calendario" [ngModel]="hastaComentarios()" (ngModelChange)="hastaComentarios.set($event)"/>
+                    <label for="hasta2" class="ms-2 text-white">Hasta</label>
+                    <input type="date" id="hasta2" class="calendario bg-secondary text-white border-0 p-2 rounded" [ngModel]="hastaComentarios()" (ngModelChange)="hastaComentarios.set($event)"/>
                 </div>
                 <div>
-                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticasComentarios()">Aplicar</button>
+                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticas2()">Aplicar</button>
                 </div>
             </div>
-            <div class="p-3 container-charts">
+            <div class="p-3 container-charts w-100" style="height: 350px;">
                 <canvas id="miChartComentarios"></canvas>
             </div>
         </div>
+
+        <!-- Gráfico 3: Comentarios por publicación (Torta) -->
+        <div class="d-flex flex-column gap-4 align-items-center w-75 p-4 border border-secondary rounded bg-dark">
+            <h3 class="m-0 text-white">Cantidad de comentarios en cada publicación (Torta)</h3>
+            <h5 class="m-0 text-white-50">Elige un periodo</h5>
+            <div class="d-flex align-items-center justify-content-center gap-4 flex-wrap">
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="desde3" class="ms-2 text-white">Desde</label>
+                    <input type="date" id="desde3" class="calendario bg-secondary text-white border-0 p-2 rounded" [ngModel]="desdePubComentarios()" (ngModelChange)="desdePubComentarios.set($event)"/>
+                </div>
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="hasta3" class="ms-2 text-white">Hasta</label>
+                    <input type="date" id="hasta3" class="calendario bg-secondary text-white border-0 p-2 rounded" [ngModel]="hastaPubComentarios()" (ngModelChange)="hastaPubComentarios.set($event)"/>
+                </div>
+                <div>
+                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticas3()">Aplicar</button>
+                </div>
+            </div>
+            <div class="p-3 container-charts w-100" style="height: 350px;">
+                <canvas id="miChartPubComentarios"></canvas>
+            </div>
+        </div>
+
     </div>
 }
 @else

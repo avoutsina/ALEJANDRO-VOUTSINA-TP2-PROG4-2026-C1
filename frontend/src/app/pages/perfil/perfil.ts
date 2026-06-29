@@ -10,7 +10,6 @@ import Swal from 'sweetalert2';
 import { Loading } from '../components/loading/loading';
 import { UsuarioR } from '../../interfaces/usuario';
 import { UsuariosService } from '../../services/usuariosService';
-import { TraerUsuarioClass } from '../../Classes/traerUsuario';
 import { PublicacionItemComponent } from '../components/publicacion-item/publicacion-item';
 
 @Component({
@@ -273,12 +272,12 @@ export class Perfil {
   /////////////////////////////////////////////////////////////////////
   ////////////////////////////TRAER UN USUARIO////////////////////////
   usuario = signal<Partial<UsuarioR> | null>(null);
-  traerUsuariosClass: TraerUsuarioClass = new TraerUsuarioClass();
+  usuariosService = inject(UsuariosService);
 
   traerUsuario(): Promise<void> {
     if (!this.usuarioSeleccionado) return Promise.resolve();
     return new Promise((resolve) => {
-      this.traerUsuariosClass.traerUsuario(this.usuarioSeleccionado!).subscribe({
+      this.usuariosService.traerUsuario(this.usuarioSeleccionado!).subscribe({
         next: (res) => {
           this.usuario.set(res);
           resolve();

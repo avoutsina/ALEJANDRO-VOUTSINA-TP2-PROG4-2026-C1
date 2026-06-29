@@ -146,4 +146,34 @@ export class PublicacionesUsuario {
       { headers: this.getToken() },
     );
   }
+
+  traerEstadisticasPublicaciones(desde?: string, hasta?: string): Observable<any[]> {
+    const params: any = {};
+    if (desde) params.desde = desde;
+    if (hasta) params.hasta = hasta;
+    return this.httpClient.get<any[]>(`${this.apiUrl}/estadisticas/publicaciones-por-usuario`, {
+      headers: this.getToken(),
+      params
+    });
+  }
+
+  traerEstadisticasComentariosTotales(desde?: string, hasta?: string): Observable<any[]> {
+    const params: any = {};
+    if (desde) params.desde = desde;
+    if (hasta) params.hasta = hasta;
+    return this.httpClient.get<any[]>(`${this.apiUrl}/estadisticas/comentarios-totales`, {
+      headers: this.getToken(),
+      params
+    });
+  }
+
+  traerEstadisticasComentariosPorPublicacion(desde?: string, hasta?: string): Observable<any[]> {
+    const params: any = {};
+    if (desde) params.desde = desde;
+    if (hasta) params.hasta = hasta;
+    return this.httpClient.get<any[]>(`${this.apiUrl}/estadisticas/comentarios-por-publicacion`, {
+      headers: this.getToken(),
+      params
+    });
+  }
 }

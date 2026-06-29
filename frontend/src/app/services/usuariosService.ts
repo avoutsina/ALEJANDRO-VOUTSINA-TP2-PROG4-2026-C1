@@ -29,12 +29,20 @@ export class UsuariosService
   {
     return this.httpClient.get<Partial<UsuarioR>>(`${this.apiUrl}/usuarios/${_id}`,{ headers: this.getToken() });
   }
+  crearUsuario(parametros: Partial<UsuarioR>)
+  {
+    return this.httpClient.post<Partial<UsuarioR>>(`${this.apiUrl}/usuarios`, parametros, { headers: this.getToken() });
+  }
   modificarUsuario(_id: string, parametros: Partial<UsuarioR>)
   {
     return this.httpClient.patch<Partial<UsuarioR>[]>(`${this.apiUrl}/usuarios/modificar/${_id}`, parametros, { headers: this.getToken() });
   }
   eliminarUsuario(id?: string)
   {
-    return this.httpClient.delete<Partial<UsuarioR>[]>(`${this.apiUrl}/usuarios/${id}`,{ headers: this.getToken() });
+    return this.httpClient.delete<any>(`${this.apiUrl}/usuarios/${id}`,{ headers: this.getToken() });
+  }
+  reactivarUsuario(id?: string)
+  {
+    return this.httpClient.post<any>(`${this.apiUrl}/usuarios/reactivar/${id}`, {}, { headers: this.getToken() });
   }
 }

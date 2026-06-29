@@ -109,12 +109,25 @@ export class UsuariosService
   {
     try
     {
-      const resultado = await this.usuarioModel.deleteOne({_id: id})
+      const resultado = await this.usuarioModel.updateOne({_id: id}, { baneado: true });
       return resultado;
     }
     catch
     {
-      throw new HttpException("No se pudo eliminar el usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException("No se pudo deshabilitar el usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async reactivar(id: string)
+  {
+    try
+    {
+      const resultado = await this.usuarioModel.updateOne({_id: id}, { baneado: false });
+      return resultado;
+    }
+    catch
+    {
+      throw new HttpException("No se pudo habilitar el usuario", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

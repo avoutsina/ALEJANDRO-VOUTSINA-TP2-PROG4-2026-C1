@@ -46,7 +46,7 @@ export class AutenticacionService {
 
     if (await bcrypt.compare(user.contrasenia, usuario.contrasenia)) {
       if (usuario.baneado) {
-        throw new ForbiddenException('El usuario ha sido Baneado');
+        throw new UnauthorizedException('Su usuario ha sido deshabilitado. No tiene autorización para ingresar.');
       } else {
         const tokenRes = this.createToken(
           usuario.correo,

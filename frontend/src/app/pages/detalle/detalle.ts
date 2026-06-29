@@ -165,6 +165,37 @@ export class DetallePage implements OnInit
     });
   }
 
+  eliminarPublicacion(): void
+  {
+    const pub = this.publicacion();
+    if (!pub) return;
+
+    Swal.fire({
+      title: '¿Estás seguro de eliminar?',
+      text: 'Si eliminas esta publicación la perderás',
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonColor: '#3085d6',
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.publicacionService.eliminarPublicacion(pub._id).subscribe({
+          next: () => {
+            Swal.fire({ title: 'Eliminada', icon: 'success' }).then(() => {
+              this.router.navigateByUrl('/inicio');
+            });
+          },
+          error: (error) => {
+            const err = error.error?.message ?? 'Error al eliminar';
+            Swal.fire({ title: err, icon: 'error' });
+          }
+        });
+      }
+    });
+  }
+
   get getSub() { return this.authService.getSub as string; }
   get getAvatar() { return this.authService.getAvatar as string; }
   get getPermiso() { return this.authService.getPermiso; }

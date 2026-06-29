@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { AuthGuard } from '../../guards/auth.guard';
 import { AdminGuard } from '../../guards/admin.guard';
@@ -15,6 +16,13 @@ export class UsuariosController
   findAll()
   {
     return this.usuariosService.findAll();
+  }
+
+  @UseGuards(AdminGuard)
+  @Post()
+  create(@Body() createUsuarioDto: CreateUsuarioDto)
+  {
+    return this.usuariosService.create(createUsuarioDto);
   }
   
   @Get("ids")
@@ -42,10 +50,19 @@ export class UsuariosController
   {
     return this.usuariosService.update(id, updateUsuarioDto);
   }
+
   @UseGuards(AdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string)
   {
     return this.usuariosService.remove(id);
   }
+
+  @UseGuards(AdminGuard)
+  @Post('reactivar/:id')
+  reactivar(@Param('id') id: string)
+  {
+    return this.usuariosService.reactivar(id);
+  }
 }
+

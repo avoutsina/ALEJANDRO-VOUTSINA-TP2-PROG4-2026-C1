@@ -23,7 +23,7 @@
             <tbody>
                 @for (usuario of arrayUsuarios(); track $index)
                 {
-                <tr class="container-tabla">
+                <tr class="container-tabla" appHighlight [appHighlightColor]="'rgba(255,255,255,0.05)'" [appTooltip]="'Usuario: ' + usuario.nombreUsuario">
                     <td>
                         <div class="view cursor-pointer">
                             @if(usuario.avatar)
@@ -48,13 +48,8 @@
                     
                     <td>{{ usuario.fechaDeNacimiento | date:'dd/MM/yyyy' }}</td>
                     <td>
-                    <span class="d-flex align-items-center ms-3">
-                        <div class="form-check form-switch">
-                            <input type="checkbox" id="admin" class="form-check-input color" [checked]="usuario.admin? true: false" (change)="cambiarAdmin(usuario._id, $event)">
-                        </div>
-                    </span>
+                        <span class="badge bg-secondary">{{ usuario.admin | roleFriendly }}</span>
                     </td>
-
                     <td>
                         @if(usuario.baneado)
                         {
@@ -70,7 +65,104 @@
                 }
             </tbody>
         </table>
-        <button class="btn btn-secondary mt-4 mb-5 boton" routerLink="/registro">CREAR USUARIO</button>
+        <div class="d-flex gap-3 align-items-center mt-4 mb-5">
+            <button class="btn btn-secondary boton" (click)="toggleFormulario()">
+                {{ mostrarFormularioCrear() ? 'CANCELAR CREACIÓN' : 'CREAR USUARIO' }}
+            </button>
+        </div>
+
+        <!-- Formulario embebido de registro para nuevos usuarios -->
+        @if (mostrarFormularioCrear()) {
+            <div class="container_principal mt-4 p-4 border border-secondary rounded bg-dark text-white">
+                <h3 class="text-center mb-4">Nuevo Usuario</h3>
+                <form [formGroup]="formularioCrear" (ngSubmit)="submitCrear()" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label text-white">Nombre</label>
+                        <input type="text" id="nombre" formControlName="nombre" class="form-control bg-secondary text-white border-0">
+                        @if (getNombre.errors?.["required"] && getNombre.touched) {
+                            <small class="text-danger">Campo requerido</small>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apellido" class="form-label text-white">Apellido</label>
+                        <input type="text" id="apellido" formControlName="apellido" class="form-control bg-secondary text-white border-0">
+                        @if (getApellido.errors?.["required"] && getApellido.touched) {
+                            <small class="text-danger">Campo requerido</small>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nombreUsuario" class="form-label text-white">Nombre de Usuario</label>
+                        <input type="text" id="nombreUsuario" formControlName="nombreUsuario" class="form-control bg-secondary text-white border-0">
+                        @if (getNombreUsuario.errors?.["required"] && getNombreUsuario.touched) {
+                            <small class="text-danger">Campo requerido</small>
+                        }
+                        @if (getNombreUsuario.errors?.["pattern"] && getNombreUsuario.touched) {
+                            <small class="text-danger">Solo números y letras</small>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="correo" class="form-label text-white">Correo electrónico</label>
+                        <input type="email" id="correo" formControlName="correo" class="form-control bg-secondary text-white border-0">
+                        @if (getCorreo.errors?.["required"] && getCorreo.touched) {
+                            <small class="text-danger">Campo requerido</small>
+                        }
+                        @if (getCorreo.errors?.["email"] && getCorreo.touched) {
+                            <small class="text-danger">Formato inválido</small>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="contrasenia" class="form-label text-white">Contraseña</label>
+                        <input type="password" id="contrasenia" formControlName="contrasenia" class="form-control bg-secondary text-white border-0">
+                        @if (getContrasenia.errors?.["required"] && getContrasenia.touched) {
+                            <small class="text-danger">Campo requerido</small>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="repetirContrasenia" class="form-label text-white">Repetir Contraseña</label>
+                        <input type="password" id="repetirContrasenia" formControlName="repetirContrasenia" class="form-control bg-secondary text-white border-0">
+                        @if (getRepetirContrasenia.errors?.["iguales"] && getRepetirContrasenia.touched) {
+                            <small class="text-danger">Las contraseñas no coinciden</small>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fechaDeNacimiento" class="form-label text-white">Fecha de Nacimiento</label>
+                        <input type="date" id="fechaDeNacimiento" formControlName="fechaDeNacimiento" class="form-control bg-secondary text-white border-0">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="descripcion" class="form-label text-white">Descripción</label>
+                        <textarea id="descripcion" formControlName="descripcion" class="form-control bg-secondary text-white border-0" rows="1"></textarea>
+                    </div>
+
+                    <!-- Perfil: Radio Buttons para Usuario o Administrador -->
+                    <div class="col-12 my-3">
+                        <label class="form-label text-white d-block">Perfil / Rol</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="rolUsuario" [value]="false" formControlName="admin">
+                            <label class="form-check-label text-white" for="rolUsuario">Usuario</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="rolAdmin" [value]="true" formControlName="admin">
+                            <label class="form-check-label text-white" for="rolAdmin">Administrador</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 d-flex align-items-center gap-3 my-2">
+                        <input type="file" #agregarImg hidden (change)="imagenClass.mostrarImagen($event)" accept="image/png, image/jpeg">
+                        @if (imagenClass.reviewUrl) {
+                            <div class="review" style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden;">
+                                <img [src]="imagenClass.reviewUrl" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        } @else {
+                            <button type="button" class="btn btn-outline-light btn-sm" (click)="agregarImg.click()">Seleccionar Avatar</button>
+                        }
+                    </div>
+
+                    <div class="col-12 mt-4 text-end">
+                        <button type="submit" class="btn btn-primary" [disabled]="formularioCrear.invalid">Aceptar y Registrar</button>
+                    </div>
+                </form>
+            </div>
+        }
     </div>   
 }
 @else
