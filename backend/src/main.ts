@@ -18,4 +18,4 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   await app.listen(process.env.PORT ?? 3000); // Escucho desde .env o puerto 3000
 }
-bootstrap(); // LLamo al metodo
+bootstrap(); 
