@@ -40,11 +40,3 @@ Página de **detalle de publicación**, con sus comentarios paginados (carga ini
 ### Sprint #4
 
 Funcionalidades de **administrador**: baja de publicaciones de cualquier usuario, y un nuevo **dashboard de usuarios** para listar, crear, habilitar y deshabilitar cuentas. Se incorporó también el **dashboard de estadísticas**, con gráficos variados (publicaciones y comentarios por usuario/tiempo), soporte **PWA**, y la creación de pipes y directivas propias. En el backend se desarrolló el módulo de **Usuarios** (con validación de rol administrador) y el módulo de **Estadísticas**, exponiendo las rutas necesarias para alimentar los gráficos.
-
-### Sprint #5 - Recuperatorio
-
-Se permitió acceder al **perfil de otros usuarios** haciendo clic en su nombre o foto, manteniendo las acciones de administrador disponibles. Se reemplazó la paginación tradicional de publicaciones por **scroll infinito**. Se sumaron nuevas estadísticas: cantidad de inicios de sesión por usuario, visitas al propio perfil por parte de otros usuarios, y "me gusta" otorgados por día, junto con la lógica de backend correspondiente.
-
-### Sprint #6 - Fecha de final
-
-Se agregó la posibilidad de **guardar/quitar publicaciones** de favoritos, con su correspondiente pantalla de **Guardados**, y de **compartir publicaciones** con otros usuarios, junto con la pantalla de **Compartidos** para ver lo recibido y quién lo compartió. Se incorporaron dos nuevos criterios de ordenamiento (por cantidad de veces guardada y por cantidad de veces compartida), con su respectiva lógica en el backend.
