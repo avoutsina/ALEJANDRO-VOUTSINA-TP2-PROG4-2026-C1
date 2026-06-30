@@ -1,13 +1,12 @@
 import { BadRequestException, CanActivate, ExecutionContext, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { type Request } from 'express';
-import { JsonWebTokenError, JwtPayload, TokenExpiredError, verify} from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class AuthGuard implements CanActivate
 {
-  constructor( private readonly configService : ConfigService){}
+  constructor(private readonly jwtService: JwtService){}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean>
   {
@@ -26,23 +25,18 @@ export class AuthGuard implements CanActivate
 
     try
     {
-      const secret = this.configService.get<string>("JWT_SECRET")
-      if(!secret)
-      {
-          return false
-      }
-      const tokenValidado : JwtPayload | string = verify(token, secret);
+      const tokenValidado = this.jwtService.verify(token);
       (request as any).user = tokenValidado;
       return true;
     }
-    catch(error)
+    catch(error: any)
     {
-      if(error instanceof TokenExpiredError)
+      if(error.name === 'TokenExpiredError')
       {
         throw new HttpException('Token expirado', 401);
       }
 
-      if(error instanceof JsonWebTokenError)
+      if(error.name === 'JsonWebTokenError')
       {
         throw new HttpException('Firma falló o tóken modificado', 401);
       }

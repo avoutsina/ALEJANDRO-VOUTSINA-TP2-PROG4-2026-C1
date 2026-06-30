@@ -29,16 +29,16 @@
 
 
         <div class="d-flex flex-column gap-4 align-items-start">
-            <h3 class="m-0">Cantidad de comentarios por dia</h3>
+            <h3 class="m-0">Cantidad de comentarios por usuario</h3>
             <h5 class="m-0">Elige un periodo</h5>
             <div class="d-flex align-items-center justify-content-center gap-4">
                 <div class="d-flex justify-content-center flex-column gap-1">
-                    <label for="desde" class="ms-2">Desde</label>
-                    <input type="date" id="desde" class="calendario" [ngModel]="desdeComentarios()" (ngModelChange)="desdeComentarios.set($event)"/>
+                    <label for="desde-comentarios" class="ms-2">Desde</label>
+                    <input type="date" id="desde-comentarios" class="calendario" [ngModel]="desdeComentarios()" (ngModelChange)="desdeComentarios.set($event)"/>
                 </div>
                 <div class="d-flex justify-content-center flex-column gap-1">
-                    <label for="hasta" class="ms-2">Hasta</label>
-                    <input type="date" id="hasta" class="calendario" [ngModel]="hastaComentarios()" (ngModelChange)="hastaComentarios.set($event)"/>
+                    <label for="hasta-comentarios" class="ms-2">Hasta</label>
+                    <input type="date" id="hasta-comentarios" class="calendario" [ngModel]="hastaComentarios()" (ngModelChange)="hastaComentarios.set($event)"/>
                 </div>
                 <div>
                     <button class="btn btn-secondary mt-4" (click)="cargarEstadisticasComentarios()">Aplicar</button>
@@ -46,6 +46,27 @@
             </div>
             <div class="p-3 container-charts">
                 <canvas id="miChartComentarios"></canvas>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-4 align-items-start">
+            <h3 class="m-0">Cantidad de comentarios por publicación</h3>
+            <h5 class="m-0">Elige un periodo</h5>
+            <div class="d-flex align-items-center justify-content-center gap-4">
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="desde-pubcom" class="ms-2">Desde</label>
+                    <input type="date" id="desde-pubcom" class="calendario" [ngModel]="desdePublicacionComentarios()" (ngModelChange)="desdePublicacionComentarios.set($event)"/>
+                </div>
+                <div class="d-flex justify-content-center flex-column gap-1">
+                    <label for="hasta-pubcom" class="ms-2">Hasta</label>
+                    <input type="date" id="hasta-pubcom" class="calendario" [ngModel]="hastaPublicacionComentarios()" (ngModelChange)="hastaPublicacionComentarios.set($event)"/>
+                </div>
+                <div>
+                    <button class="btn btn-secondary mt-4" (click)="cargarEstadisticasPublicacionComentarios()">Aplicar</button>
+                </div>
+            </div>
+            <div class="p-3 container-charts">
+                <canvas id="miChartPublicacionComentarios"></canvas>
             </div>
         </div>
     </div>

@@ -42,10 +42,27 @@ export class UsuariosController
   {
     return this.usuariosService.update(id, updateUsuarioDto);
   }
+
+  // POST: alta de un nuevo usuario por parte de un administrador (perfil elegible)
+  @UseGuards(AdminGuard)
+  @Post()
+  adminCreate(@Body() createUsuarioDto: any) {
+    return this.usuariosService.create(createUsuarioDto);
+  }
+
+  // DELETE: baja lógica, deshabilita a un usuario (baneado: true)
   @UseGuards(AdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string)
   {
-    return this.usuariosService.remove(id);
+    return this.usuariosService.update(id, { baneado: true });
+  }
+
+  // POST: alta lógica, rehabilita a un usuario deshabilitado (baneado: false)
+  @UseGuards(AdminGuard)
+  @Post('habilitar/:id')
+  habilitar(@Param('id') id: string)
+  {
+    return this.usuariosService.update(id, { baneado: false });
   }
 }

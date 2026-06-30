@@ -99,6 +99,19 @@ export class PublicacionesUsuario {
     );
   }
 
+  traerComentariosPublicacionStats(
+    desde?: string,
+    hasta?: string,
+  ): Observable<{ titulo: string; cantidadComentarios: number }[]> {
+    const params: any = {};
+    if (desde) params.desde = desde;
+    if (hasta) params.hasta = hasta;
+    return this.httpClient.get<{ titulo: string; cantidadComentarios: number }[]>(
+      `${this.apiUrl}/publicaciones-comentarios/stats`,
+      { headers: this.getToken(), params },
+    );
+  }
+
   crearPublicacion(
     publicacion: { titulo: string; descripcion?: string },
     file?: File | null,

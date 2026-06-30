@@ -37,4 +37,8 @@ export class UsuariosService
   {
     return this.httpClient.delete<Partial<UsuarioR>[]>(`${this.apiUrl}/usuarios/${id}`,{ headers: this.getToken() });
   }
+  habilitarUsuario(id?: string)
+  {
+    return this.httpClient.post<Partial<UsuarioR>[]>(`${this.apiUrl}/usuarios/habilitar/${id}`, {}, { headers: this.getToken() });
+  }
 }
