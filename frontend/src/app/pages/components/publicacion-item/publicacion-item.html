@@ -71,7 +71,10 @@
                 <p class="m-0">{{publicacion.comentarios.length}}</p>
             </div>
 
-            <p class="m-0">{{publicacion.created_at | date:'dd-MM-yyyy' }}</p>
+            <div class="d-flex flex-column align-items-end gap-1">
+                <p class="m-0">{{publicacion.created_at | date:'dd-MM-yyyy' }}</p>
+                <a class="link-detalle" [routerLink]="['/detalle', publicacion._id]">Ver publicación →</a>
+            </div>
         </div>
 
         @if(publicacion.descripcion)
@@ -83,7 +86,7 @@
 
         @if(mostrarComentarios())
         {
-            <div class="container-comentarios">
+            <div class="container-comentarios" [class.con-scroll]="paginaActualComentarios > 1" [class.sin-scroll]="paginaActualComentarios === 1">
                 @for (comentario of this.comentarios(); track $index)
                 {
                     <div class="d-flex align-items-center gap-2 mb-3 container-comentario">
@@ -99,7 +102,12 @@
                         </div>
                          <div class="box-comment d-flex align-items-center">
                              <div class="d-flex flex-column">
-                                 <small>{{comentario.usuario.nombreUsuario}}</small>
+                                 <div class="d-flex align-items-center gap-2">
+                                   <small>{{comentario.usuario.nombreUsuario}}</small>
+                                   @if(comentario.modificado) {
+                                     <span class="badge-editado">editado</span>
+                                   }
+                                 </div>
                                  <p class="m-0 descripcion">{{comentario.texto}}</p>
                              </div>
                          </div>

@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Headers,
+  HttpCode,
   Post,
-  Req,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -44,10 +45,33 @@ export class AutenticacionController {
     return this.autenticacionService.register(body);
   }
 
+  /**
+   * Requisito sprint:
+   * - autorizar: valida token y devuelve datos usuario.
+   * - si token inválido/vencido => 401.
+   */
+  @Post('autorizar')
+  @HttpCode(200)
+  async autorizar(@Headers('Authorization') authHeader: string) {
+    if (!authHeader) throw new BadRequestException('Falta Authorization');
+    return this.autenticacionService.autorizar(authHeader);
+  }
+
+  /**
+   * Requisito sprint:
+   * - refrescar: valida token actual y devuelve nuevo JWT con misma payload y exp 15m.
+   */
+  @Post('refrescar')
+  @HttpCode(200)
+  async refrescar(@Headers('Authorization') authHeader: string) {
+    if (!authHeader) throw new BadRequestException('Falta Authorization');
+    return this.autenticacionService.refrescar(authHeader);
+  }
+
+  // Endpoint legado (puede mantenerse)
   @UseGuards(AuthGuard)
   @Get('data')
   traer(@Headers('Authorization') autHeader: string) {
     return this.autenticacionService.verificar(autHeader);
   }
 }
-

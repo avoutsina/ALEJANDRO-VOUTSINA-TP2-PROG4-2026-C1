@@ -1,0 +1,206 @@
+.detalle-page {
+  min-height: 100vh;
+  background-color: transparent;
+  padding: 2rem 1rem 4rem;
+}
+
+.detalle-layout {
+  max-width: 600px;
+  width: 100%;
+}
+
+.width-100 {
+  width: 100%;
+}
+
+.loading-center {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+/* Card base idéntica a .cards de inicio */
+.cards {
+  background-color: rgb(14, 39, 48);
+  border-radius: 20px;
+  width: 600px;
+  color: white;
+}
+
+/* Estilos de usuario (Header) */
+.view {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.view img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Imagen de publicación */
+.container-foto-custom {
+  width: 100%;
+  position: relative;
+}
+
+.container-foto-custom img {
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+/* Estadísticas e Iconos */
+.container-stats {
+  padding: 12px 25px;
+}
+
+.container-stats img {
+  width: 34px;
+  margin-right: 7px;
+}
+
+.icono {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.icono:hover {
+  transform: scale(1.05);
+}
+
+.icono:active {
+  transform: scale(0.7);
+}
+
+.descripcion {
+  max-width: 490px;
+  word-wrap: break-word;
+}
+
+/* Sección de comentarios y lista */
+.comentarios-section-custom {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-comentarios-custom.con-scroll {
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 8px;
+  scrollbar-width: none;
+}
+.container-comentarios-custom.sin-scroll {
+  max-height: none;
+  overflow: visible;
+}
+
+.container-comentarios-custom::-webkit-scrollbar {
+  width: 0px;
+}
+
+.container-comentarios-custom:hover {
+  scrollbar-width: auto;
+}
+
+.container-comentarios-custom:hover::-webkit-scrollbar {
+  width: 5px;
+}
+
+.container-comentarios-custom::-webkit-scrollbar-track {
+  background: #888;
+  border-radius: 8px;
+}
+
+.container-comentarios-custom::-webkit-scrollbar-thumb {
+  background: #d47100;
+  border-radius: 8px;
+}
+
+/* Box comentario igual a inicio */
+.box-comment {
+  background-color: rgb(21, 55, 67);
+  border-radius: 12px;
+  padding: 6px 12px;
+  color: #fff;
+  min-width: 170px;
+  max-width: 480px;
+  word-wrap: break-word;
+}
+
+.container-comentario {
+  margin-bottom: 12px;
+}
+
+.usuario-comentario {
+  width: 35px !important;
+  height: 35px !important;
+}
+
+.container-comentario:hover .container-edits {
+  display: inline-flex !important;
+}
+
+.container-edits {
+  display: none;
+}
+
+.container-edits img {
+  cursor: pointer;
+  width: 21px;
+}
+
+.container-edits img:hover {
+  transform: scale(1.1);
+}
+
+.container-edits img:active {
+  transform: scale(0.9);
+}
+
+/* Input comentarios igual a inicio */
+.imagen-comentario {
+  width: 45px !important;
+  height: 45px !important;
+}
+
+.container-input {
+  width: 70%;
+}
+
+.input-coment {
+  border-radius: 15px;
+}
+
+.input-coment:focus {
+  box-shadow: 0 0 0 0.1rem rgba(212, 113, 0, 0.837);
+}
+
+/* Badge editado */
+.badge-editado {
+  display: inline-block;
+  background: rgba(255, 193, 7, 0.18);
+  color: #f0c030;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  border-radius: 20px;
+  font-size: 0.65rem;
+  padding: 1px 7px;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}

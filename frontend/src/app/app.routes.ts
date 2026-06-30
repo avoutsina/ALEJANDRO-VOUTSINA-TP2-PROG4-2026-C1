@@ -3,9 +3,15 @@ import { Inicio } from './pages/inicio/inicio';
 import { estaLogueadoGuard } from './guards/estaLogueadoGuard';
 import { noEstaLogueadoGuard } from './guards/no-esta-logueado-guard';
 import { esAdminGuard } from './guards/es-admin-guard';
+import { CargandoPage } from './pages/cargando/cargando';
 
-export const routes: Routes = 
+export const routes: Routes =
 [
+    // Ruta raíz: pantalla de carga que valida el token y redirige
+    {
+        path: "",
+        component: CargandoPage,
+    },
     {
         path: "inicio",
         component: Inicio,
@@ -24,6 +30,12 @@ export const routes: Routes =
     {
         path: "crear",
         loadComponent: () => import("./pages/publicacion/publicaciones").then(m => m.Publicacion),
+        canActivate: [noEstaLogueadoGuard],
+    },
+    {
+        // Página de detalle de publicación
+        path: "detalle/:id",
+        loadComponent: () => import("./pages/detalle/detalle").then(m => m.DetallePage),
         canActivate: [noEstaLogueadoGuard],
     },
     {
@@ -47,13 +59,8 @@ export const routes: Routes =
         canActivate: [noEstaLogueadoGuard, esAdminGuard]
     },
     {
-        path: "",
-        redirectTo: "inicio",
-        pathMatch: "full"
-    },
-    {
         path: "**",
-        redirectTo: "inicio",
+        redirectTo: "",
         pathMatch: "full"
     }
 ];
