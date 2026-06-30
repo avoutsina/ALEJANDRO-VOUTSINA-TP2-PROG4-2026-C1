@@ -12,8 +12,11 @@
 .container-estadisticas
 {
     padding-left: 350px;
+    padding-right: 50px;
+    padding-bottom: 50px;
     width: 100%;
     min-height: 100vh;
+    flex-wrap: wrap;
 }
 .container-charts
 {

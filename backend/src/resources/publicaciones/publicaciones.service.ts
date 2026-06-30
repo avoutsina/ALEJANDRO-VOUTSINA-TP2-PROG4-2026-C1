@@ -56,8 +56,17 @@ export class PublicacionesService {
     if (desde || hasta) {
       match.created_at = {};
 
-      if (desde) match.created_at.$gte = new Date(desde);
-      if (hasta) match.created_at.$lte = new Date(hasta);
+      if (desde) {
+        // En Argentina (UTC-3) el inicio del día es a las 03:00 UTC
+        match.created_at.$gte = new Date(`${desde}T03:00:00.000Z`);
+      }
+      if (hasta) {
+        // El fin del día de 'hasta' en Argentina (UTC-3) es a las 02:59:59.999 UTC del día siguiente
+        const hastaDate = new Date(`${hasta}T03:00:00.000Z`);
+        hastaDate.setDate(hastaDate.getDate() + 1);
+        hastaDate.setMilliseconds(hastaDate.getMilliseconds() - 1);
+        match.created_at.$lte = hastaDate;
+      }
     }
 
     const resultado = await this.publicacionModel.aggregate([
@@ -222,10 +231,15 @@ export class PublicacionesService {
 
       if (desde || hasta) {
         matchComment['comentarios.created_at'] = {};
-        if (desde)
-          matchComment['comentarios.created_at'].$gte = new Date(desde);
-        if (hasta)
-          matchComment['comentarios.created_at'].$lte = new Date(hasta);
+        if (desde) {
+          matchComment['comentarios.created_at'].$gte = new Date(`${desde}T03:00:00.000Z`);
+        }
+        if (hasta) {
+          const hastaDate = new Date(`${hasta}T03:00:00.000Z`);
+          hastaDate.setDate(hastaDate.getDate() + 1);
+          hastaDate.setMilliseconds(hastaDate.getMilliseconds() - 1);
+          matchComment['comentarios.created_at'].$lte = hastaDate;
+        }
       }
 
       const resultado = await this.publicacionModel.aggregate([
@@ -262,6 +276,52 @@ export class PublicacionesService {
     } catch (err) {
       throw new HttpException(
         'No se pudieron obtener comentarios',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findCommentsPerPublicationStats(desde?: string, hasta?: string) {
+    try {
+      const matchComment: any = {};
+      if (desde || hasta) {
+        matchComment['comentarios.created_at'] = {};
+        if (desde) {
+          matchComment['comentarios.created_at'].$gte = new Date(`${desde}T03:00:00.000Z`);
+        }
+        if (hasta) {
+          const hastaDate = new Date(`${hasta}T03:00:00.000Z`);
+          hastaDate.setDate(hastaDate.getDate() + 1);
+          hastaDate.setMilliseconds(hastaDate.getMilliseconds() - 1);
+          matchComment['comentarios.created_at'].$lte = hastaDate;
+        }
+      }
+
+      const resultado = await this.publicacionModel.aggregate([
+        { $match: { eliminado: { $ne: true } } },
+        { $unwind: '$comentarios' },
+        ...(desde || hasta ? [{ $match: matchComment }] : []),
+        {
+          $group: {
+            _id: '$_id',
+            titulo: { $first: '$titulo' },
+            cantidadComentarios: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            publicacionId: '$_id',
+            titulo: 1,
+            cantidadComentarios: 1,
+          },
+        },
+      ]);
+
+      return resultado;
+    } catch (err) {
+      throw new HttpException(
+        'No se pudieron obtener estadísticas de comentarios por publicación',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

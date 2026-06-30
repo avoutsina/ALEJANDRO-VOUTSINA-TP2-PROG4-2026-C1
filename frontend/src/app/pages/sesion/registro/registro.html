@@ -159,12 +159,19 @@
             }
             @if(this.authService.getPermiso)
             {
-                <div [formGroup]="formularioRegistro" class="mt-4 d-flex gap-3">
-                    <div class="form-check form-switch">
-                        <input type="checkbox" id="admin" formControlName="admin" class="form-check-input color">
-                        <label for="admin" class="form-check-label">ADMINISTRADOR</label>
+                <div class="mt-4 d-grid gap-2">
+                    <label class="info mb-1">Perfil del nuevo usuario:</label>
+                    <div class="d-flex gap-4">
+                        <div class="form-check">
+                            <input type="radio" id="rol-usuario" name="admin" [value]="false" formControlName="admin" class="form-check-input">
+                            <label for="rol-usuario" class="form-check-label text-white">Usuario</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="rol-admin" name="admin" [value]="true" formControlName="admin" class="form-check-input">
+                            <label for="rol-admin" class="form-check-label text-white">Administrador</label>
+                        </div>
                     </div>
-                    <p class="info">Permisos para manipular usuarios y publicaciones (Interfaz Adicional)</p>
+                    <p class="info mt-2">Permisos para manipular usuarios y publicaciones (Interfaz Adicional)</p>
                 </div>
             }
         </div>

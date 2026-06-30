@@ -19,6 +19,7 @@ import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacioneDto } from './dto/create-publicaciones.dto';
 import { UpdatePublicacioneDto } from './dto/update-publicaciones.dto';
 import { AuthGuard } from '../../guards/auth.guard';
+import { AdminGuard } from '../../guards/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { CloudinaryService } from '../../cloudinary/cloudinary.service';
@@ -86,6 +87,7 @@ export class PublicacionesController {
     return this.publicacionesService.findAll(sort, userId, off, lim);
   }
 
+  @UseGuards(AdminGuard)
   @Get('publicaciones/:id')
   countByUserAndDate(
     @Param('id') id: string,
@@ -100,6 +102,7 @@ export class PublicacionesController {
     return this.publicacionesService.findAllMe(userId, pagina);
   }
 
+  @UseGuards(AdminGuard)
   @Get('comentarios/usuarios/:id')
   findAllComments(
     @Param('id') userId: string,
@@ -107,6 +110,15 @@ export class PublicacionesController {
     @Query('hasta') hasta: string,
   ) {
     return this.publicacionesService.findAllComments(userId, desde, hasta);
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('publicaciones-comentarios/stats')
+  findCommentsPerPublicationStats(
+    @Query('desde') desde?: string,
+    @Query('hasta') hasta?: string,
+  ) {
+    return this.publicacionesService.findCommentsPerPublicationStats(desde, hasta);
   }
 
   @Get('comentarios/:id')
