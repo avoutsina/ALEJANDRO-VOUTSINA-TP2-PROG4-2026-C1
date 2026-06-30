@@ -149,31 +149,30 @@ export class Usuarios
   {
     Swal.fire
     ({
-      title: "¿Estas seguro de eliminar?",
-      text: "Si eliminas este usuario perderá todo",
+      title: "¿Estás seguro de deshabilitar?",
+      text: "El usuario ya no podrá ingresar a la aplicación",
       icon: "warning",
       showCancelButton: true,
       cancelButtonColor: "#3085d6",
       confirmButtonColor: "#d33",
-      confirmButtonText: "Eliminar",
+      confirmButtonText: "Deshabilitar",
       cancelButtonText: "Cancelar"
     }).then((result) =>
       {
         if (result.isConfirmed)
         {
-          this.publicacionesService.eliminarPublicaciones(id).subscribe(res =>
-          {
-            console.log(res);
-          });
           this.usuariosService.eliminarUsuario(id).subscribe(
           {
             next: (res) =>
             {
-              console.log(res);
+              // Actualizar localmente el estado del usuario en la lista
+              this.arrayUsuarios.update(arr =>
+                arr.map(u => u._id === id ? { ...u, baneado: true } : u)
+              );
             },
             error: (error) =>
             {
-              const err = error.error.message;
+              const err = error.error?.message ?? 'Error';
               Swal.fire
               ({
                 title: err,
@@ -185,8 +184,8 @@ export class Usuarios
             {
               Swal.fire
               ({
-                title: "Eliminado",
-                text: "Usuario eliminado con exito",
+                title: "Deshabilitado",
+                text: "Usuario deshabilitado con éxito",
                 icon: "success"
               });
             }
@@ -201,22 +200,24 @@ export class Usuarios
     if(!id) return;
     const valor = !estadoBan;
 
-    const accion = valor
-      ? this.usuariosService.eliminarUsuario(id)
-      : this.usuariosService.reactivarUsuario(id);
+    const request = valor 
+      ? this.usuariosService.eliminarUsuario(id) 
+      : this.usuariosService.habilitarUsuario(id);
 
-    accion.subscribe({
-      next: (res) => {
+    request.subscribe({
+      next: () => {
+        this.arrayUsuarios.update(arr =>
+          arr.map(user => user._id === id ? { ...user, baneado: valor } : user)
+        );
         Swal.fire({
           title: valor ? "Usuario deshabilitado" : "Usuario habilitado",
           icon: "success",
-          timer: 1500,
+          timer: 2000,
           showConfirmButton: false
         });
-        this.traerUsuarios();
       },
       error: (error) => {
-        const err = error.error?.message ?? "Error al cambiar estado del usuario";
+        const err = error.error?.message ?? 'Error al actualizar estado';
         Swal.fire({ title: err, icon: "error" });
       }
     });

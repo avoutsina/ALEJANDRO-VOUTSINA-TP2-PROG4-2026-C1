@@ -45,4 +45,8 @@ export class UsuariosService
   {
     return this.httpClient.post<any>(`${this.apiUrl}/usuarios/reactivar/${id}`, {}, { headers: this.getToken() });
   }
+  habilitarUsuario(id?: string)
+  {
+    return this.httpClient.post<Partial<UsuarioR>[]>(`${this.apiUrl}/usuarios/habilitar/${id}`, {}, { headers: this.getToken() });
+  }
 }

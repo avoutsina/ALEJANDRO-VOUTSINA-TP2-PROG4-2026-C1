@@ -6,70 +6,67 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CredencialesDto } from './dto/credencialesDto';
-import {
-  JsonWebTokenError,
-  sign,
-  TokenExpiredError,
-  verify,
-} from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUsuarioDto } from '../usuarios/dto/create-usuario.dto';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AutenticacionService {
   constructor(
     private readonly usuarioService: UsuariosService,
-    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async login(user: CredencialesDto) {
+  async validateUser(correo: string, contrasenia: string): Promise<any> {
     let usuario: any = null;
     try {
-      usuario = await this.usuarioService.findByEmail(user.correo);
+      usuario = await this.usuarioService.findByEmail(correo);
     } catch {
       // Ignorar y probar por nombreUsuario
     }
 
     if (!usuario) {
       try {
-        usuario = await this.usuarioService.findByNombreUsuario(user.correo);
+        usuario = await this.usuarioService.findByNombreUsuario(correo);
       } catch {
         // Ignorar
       }
     }
 
+    if (usuario && (await bcrypt.compare(contrasenia, usuario.contrasenia))) {
+      if (usuario.baneado) {
+        throw new ForbiddenException('El usuario ha sido Baneado');
+      }
+      return usuario;
+    }
+    return null;
+  }
+
+  async login(user: CredencialesDto) {
+    const usuario = await this.validateUser(user.correo, user.contrasenia);
     if (!usuario) {
       throw new UnauthorizedException('Credenciales invalidas');
     }
 
-    if (await bcrypt.compare(user.contrasenia, usuario.contrasenia)) {
-      if (usuario.baneado) {
-        throw new UnauthorizedException('Su usuario ha sido deshabilitado. No tiene autorización para ingresar.');
-      } else {
-        const tokenRes = this.createToken(
-          usuario.correo,
-          usuario.admin,
-          usuario.nombreUsuario,
-          usuario.avatar,
-          usuario._id.toString(),
-        );
-        if (!tokenRes) {
-          throw new InternalServerErrorException('No se pudo generar el token');
-        }
-        const usuarioData: any = usuario.toObject
-          ? usuario.toObject()
-          : usuario;
-        delete usuarioData.contrasenia;
-        return {
-          Token: tokenRes.Token,
-          usuario: usuarioData,
-        };
-      }
-    } else {
-      throw new UnauthorizedException('Credenciales inválidas');
+    const tokenRes = this.createToken(
+      usuario.correo,
+      usuario.admin,
+      usuario.nombreUsuario,
+      usuario.avatar,
+      usuario._id.toString(),
+    );
+    if (!tokenRes) {
+      throw new InternalServerErrorException('No se pudo generar el token');
     }
+    const usuarioData: any = usuario.toObject
+      ? usuario.toObject()
+      : usuario;
+    delete usuarioData.contrasenia;
+    return {
+      Token: tokenRes.Token,
+      usuario: usuarioData,
+    };
   }
 
   async register(user: CreateUsuarioDto) {
@@ -101,11 +98,6 @@ export class AutenticacionService {
     avatar: string | null,
     id: string,
   ) {
-    const secret = this.configService.get<string>('JWT_SECRET');
-    if (!secret) {
-      return false;
-    }
-
     const payload: {
       user: string;
       admin: boolean;
@@ -118,8 +110,7 @@ export class AutenticacionService {
       avatar: avatar,
     };
 
-    const token: string = sign(payload, secret, {
-      expiresIn: '15m',
+    const token: string = this.jwtService.sign(payload, {
       subject: id,
     });
 
@@ -171,22 +162,18 @@ export class AutenticacionService {
    * Verifica token y en caso de error lanza 401.
    */
   private verificarToken(auth: string) {
-    const secret = this.configService.get<string>('JWT_SECRET');
-    if (!secret) {
-      throw new InternalServerErrorException('Falta JWT_SECRET');
-    }
     if (!auth) throw new BadRequestException();
 
     const [tipo, token] = auth.split(' ');
     if (tipo !== 'Bearer') throw new BadRequestException();
 
     try {
-      return verify(token, secret) as any;
+      return this.jwtService.verify(token) as any;
     } catch (error: any) {
-      if (error instanceof TokenExpiredError) {
+      if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token expirado');
       }
-      if (error instanceof JsonWebTokenError) {
+      if (error.name === 'JsonWebTokenError') {
         throw new UnauthorizedException('Firma falló o token modificado');
       }
       throw new InternalServerErrorException();
@@ -198,10 +185,6 @@ export class AutenticacionService {
    * Conserva comportamiento original.
    */
   verificar(auth: string) {
-    const secret = this.configService.get<string>('JWT_SECRET');
-    if (!secret) {
-      return false;
-    }
     if (!auth) throw new BadRequestException();
 
     const [tipo, token] = auth.split(' ');
@@ -209,13 +192,13 @@ export class AutenticacionService {
     if (tipo !== 'Bearer') throw new BadRequestException();
 
     try {
-      const tokenValidado = verify(token, secret);
+      const tokenValidado = this.jwtService.verify(token);
       return tokenValidado;
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
+    } catch (error: any) {
+      if (error.name === 'TokenExpiredError') {
         return 'Token expirado';
       }
-      if (error instanceof JsonWebTokenError) {
+      if (error.name === 'JsonWebTokenError') {
         return 'Firma fallo o Token modificado';
       }
       throw new InternalServerErrorException();

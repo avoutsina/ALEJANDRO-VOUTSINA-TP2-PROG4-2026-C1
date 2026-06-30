@@ -51,11 +51,12 @@ export class UsuariosController
     return this.usuariosService.update(id, updateUsuarioDto);
   }
 
+  // POST: alta lógica, rehabilita a un usuario deshabilitado (baneado: false)
   @UseGuards(AdminGuard)
-  @Delete(':id')
-  remove(@Param('id') id: string)
+  @Post('habilitar/:id')
+  habilitar(@Param('id') id: string)
   {
-    return this.usuariosService.remove(id);
+    return this.usuariosService.reactivar(id);
   }
 
   @UseGuards(AdminGuard)
@@ -63,6 +64,14 @@ export class UsuariosController
   reactivar(@Param('id') id: string)
   {
     return this.usuariosService.reactivar(id);
+  }
+
+  // DELETE: baja lógica, deshabilita a un usuario (baneado: true)
+  @UseGuards(AdminGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string)
+  {
+    return this.usuariosService.remove(id);
   }
 }
 

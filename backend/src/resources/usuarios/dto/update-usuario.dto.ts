@@ -5,9 +5,8 @@ import { IsBoolean, IsDefined } from 'class-validator';
 export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto)
 {
     @IsBoolean()
-    @IsDefined()
-    admin!: boolean;
+    admin?: boolean;
 
     @IsBoolean()
-    baneado!: boolean;
+    baneado?: boolean;
 }

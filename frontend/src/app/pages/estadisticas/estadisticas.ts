@@ -224,4 +224,112 @@ export class Estadisticas
       }
     });
   }
+
+  //Tercer chart: Cantidad de comentarios en cada publicación en un lapso de tiempo (Gráfico de líneas)
+  desdePublicacionComentarios = signal<string | null>(null);
+  hastaPublicacionComentarios = signal<string | null>(null);
+  chartPublicacionComentarios?: any;
+  resultadosPublicacionComentarios = signal<{ titulo: string, cantidadComentarios: number }[]>([]);
+
+  cargarEstadisticasPublicacionComentarios()
+  {
+    const desde = this.desdePublicacionComentarios();
+    const hasta = this.hastaPublicacionComentarios();
+    if(!desde || !hasta) return;
+    if (this.chartPublicacionComentarios)
+    {
+      this.chartPublicacionComentarios.destroy();
+      this.chartPublicacionComentarios = undefined;
+    }
+
+    this.resultadosPublicacionComentarios.set([]);
+    this.publicacionService.traerComentariosPublicacionStats(desde, hasta).subscribe({
+      next: (res) => {
+        this.resultadosPublicacionComentarios.set(res);
+        this.dibujarChartPublicacionComentarios();
+      },
+      error: (error) => {
+        const err = error.error?.message ?? 'Error al traer estadísticas';
+        Swal.fire({ title: err, icon: "error" });
+      }
+    });
+  }
+
+  async dibujarChartPublicacionComentarios()
+  {
+    const Chart = await this.cargarChartLib();
+    if (this.chartPublicacionComentarios)
+    {
+      this.chartPublicacionComentarios.destroy();
+      this.chartPublicacionComentarios = undefined;
+    }
+
+    const labels = this.resultadosPublicacionComentarios().map(r => r.titulo);
+    const data = this.resultadosPublicacionComentarios().map(r => r.cantidadComentarios);
+
+    const canvas = document.getElementById('miChartPublicacionComentarios') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    this.chartPublicacionComentarios = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Cantidad de comentarios',
+          data,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              color: 'white'
+            },
+            title: {
+              display: true,
+              color: 'white',
+              text: 'Comentarios'
+            },
+            grid: {
+              color: 'rgba(255,255,255,0.3)'
+            }
+          },
+          x: {
+            ticks: {
+              color: 'white'
+            },
+            title: {
+              display: true,
+              color: 'white',
+              text: 'Publicación'
+            },
+            grid: {
+              color: 'rgba(255,255,255,0.3)'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: true,
+            text: 'Comentarios por publicación',
+            color: 'white'
+          }
+        }
+      }
+    });
+  }
 }
