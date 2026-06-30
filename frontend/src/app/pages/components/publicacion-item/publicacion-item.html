@@ -113,14 +113,6 @@
                                  </div>
                                  <p class="m-0 descripcion">{{comentario.texto}}</p>
                              </div>
-                             @if(comentario.usuario.userId === getSub)
-                             {
-                                 <div class="container-edits align-items-center ms-2">
-                                    <div (click)="editarComentario(comentario)">
-                                        <img src="/assets/Editar.svg" alt="editar">
-                                    </div>
-                                 </div>
-                             }
                          </div>
                     </div>
                 }
@@ -132,6 +124,7 @@
                 }      
             </div>
 
+            <!-- 
             <div class="d-flex align-items-center gap-2 mt-2">
                 <div class="view imagen-comentario">
                     @if(getAvatar)
@@ -150,18 +143,15 @@
                         placeholder="Agregar un comentario"
                         class="form-control form-control-sm input-coment"
                         [(ngModel)]="comentario"
-                        (keydown.enter)="editando()? guardarEdicion(): enviarComentario()"
+                        (keydown.enter)="enviarComentario()"
                     >
                 </div>
 
                 <div class="d-flex justify-content-center align-items-center mb-1 gap-2">
-                    @if(editando())
-                    {
-                        <img src="/assets/Cruz.svg" alt="Cancelar" class="icono" width="30px" (click)="cancelarEdicion()">
-                    }
-                    <img src="/assets/Send.svg" alt="Send" class="icono" width="30px" (click)="editando()? guardarEdicion(): enviarComentario()">
+                    <img src="/assets/Send.svg" alt="Send" class="icono" width="30px" (click)="enviarComentario()">
                 </div>
             </div>
+            -->
         }
     </div>
 </div>
