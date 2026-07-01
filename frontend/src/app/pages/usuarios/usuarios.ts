@@ -145,80 +145,41 @@ export class Usuarios
       });
   }
 
-  eliminarUsuario(id?: string)
-  {
-    Swal.fire
-    ({
-      title: "¿Estás seguro de deshabilitar?",
-      text: "El usuario ya no podrá ingresar a la aplicación",
-      icon: "warning",
-      showCancelButton: true,
-      cancelButtonColor: "#3085d6",
-      confirmButtonColor: "#d33",
-      confirmButtonText: "Deshabilitar",
-      cancelButtonText: "Cancelar"
-    }).then((result) =>
-      {
-        if (result.isConfirmed)
-        {
-          this.usuariosService.eliminarUsuario(id).subscribe(
-          {
-            next: (res) =>
-            {
-              // Actualizar localmente el estado del usuario en la lista
-              this.arrayUsuarios.update(arr =>
-                arr.map(u => u._id === id ? { ...u, baneado: true } : u)
-              );
-            },
-            error: (error) =>
-            {
-              const err = error.error?.message ?? 'Error';
-              Swal.fire
-              ({
-                title: err,
-                icon: "error",
-                draggable: true
-              });
-            },
-            complete: () =>
-            {
-              Swal.fire
-              ({
-                title: "Deshabilitado",
-                text: "Usuario deshabilitado con éxito",
-                icon: "success"
-              });
-            }
-          });
-        }
-    });
-
-  }
-
   banearUsuario(id?: string, estadoBan?: boolean)
   {
     if(!id) return;
     const valor = !estadoBan;
 
-    const request = valor 
-      ? this.usuariosService.eliminarUsuario(id) 
-      : this.usuariosService.habilitarUsuario(id);
+    Swal.fire({
+      title: valor ? "¿Estás seguro de deshabilitar este usuario?" : "¿Estás seguro de habilitar este usuario?",
+      text: valor ? "El usuario no podrá ingresar a la aplicación" : "El usuario podrá ingresar a la aplicación nuevamente",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: valor ? "Deshabilitar" : "Habilitar",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const request = valor 
+          ? this.usuariosService.eliminarUsuario(id) 
+          : this.usuariosService.habilitarUsuario(id);
 
-    request.subscribe({
-      next: () => {
-        this.arrayUsuarios.update(arr =>
-          arr.map(user => user._id === id ? { ...user, baneado: valor } : user)
-        );
-        Swal.fire({
-          title: valor ? "Usuario deshabilitado" : "Usuario habilitado",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false
+        request.subscribe({
+          next: () => {
+            this.arrayUsuarios.update(arr =>
+              arr.map(user => user._id === id ? { ...user, baneado: valor } : user)
+            );
+            Swal.fire({
+              title: valor ? "Usuario deshabilitado" : "Usuario habilitado",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false
+            });
+          },
+          error: (error) => {
+            const err = error.error?.message ?? 'Error al actualizar estado';
+            Swal.fire({ title: err, icon: "error" });
+          }
         });
-      },
-      error: (error) => {
-        const err = error.error?.message ?? 'Error al actualizar estado';
-        Swal.fire({ title: err, icon: "error" });
       }
     });
   }
@@ -232,5 +193,4 @@ export class Usuarios
       console.log(res);
     });
   }
-  
 }
