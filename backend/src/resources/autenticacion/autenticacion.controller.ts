@@ -65,10 +65,4 @@ export class AutenticacionController {
     return this.autenticacionService.refrescar(authHeader);
   }
 
-  // Endpoint legado (puede mantenerse)
-  @UseGuards(AuthGuard)
-  @Get('data')
-  traer(@Headers('Authorization') autHeader: string) {
-    return this.autenticacionService.verificar(autHeader);
-  }
 }
