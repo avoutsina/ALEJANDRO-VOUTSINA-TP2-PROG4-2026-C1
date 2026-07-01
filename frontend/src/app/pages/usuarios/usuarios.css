@@ -99,5 +99,7 @@
 
 .boton
 {
-    width: 20%;
+    width: auto;
+    padding-left: 20px;
+    padding-right: 20px;
 }
