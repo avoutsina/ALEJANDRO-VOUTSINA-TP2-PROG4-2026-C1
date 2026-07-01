@@ -3,57 +3,58 @@
         <div class="d-flex align-items-center gap-3">
             @if(publicacion.avatar)
             {
-                <div class="mb-2 view cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
-                    <img [src]="publicacion.avatar" alt="avatar">
-                </div>
+            <div class="mb-2 view cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
+                <img [src]="publicacion.avatar" alt="avatar">
+            </div>
             }
             @else
             {
-                <div class="mb-2 cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
-                    <img src="/assets/User.svg" alt="avatar" width="55px">
-                </div>
+            <div class="mb-2 cursor-pointer" [routerLink]="['/perfil', publicacion.userId]">
+                <img src="/assets/User.svg" alt="avatar" width="55px">
+            </div>
             }
-            <h4 class="cursor-pointer m-0" [routerLink]="['/perfil', publicacion.userId]">{{publicacion.nombreUsuario | titlecase}}</h4>
+            <h4 class="cursor-pointer m-0" [routerLink]="['/perfil', publicacion.userId]">{{publicacion.nombreUsuario |
+                titlecase}}</h4>
         </div>
         @if(publicacion.userId === getSub || getPermiso)
         {
-            <div (click)="eliminarPublicacion()">
-                <img src="/assets/Trash.svg" alt="eliminar" class="icono">
-            </div>
+        <div (click)="eliminarPublicacion()">
+            <img src="/assets/Trash.svg" alt="eliminar" class="icono">
+        </div>
         }
     </div>
 
     @if(publicacion.titulo)
     {
-        <h5 class="mb-2 px-1">{{ publicacion.titulo }}</h5>
+    <h5 class="mb-2 px-1">{{ publicacion.titulo }}</h5>
     }
 
     <div>
         @if(publicacion.urlImg)
         {
-            <div class="container-foto">
-                <img [src]="publicacion.urlImg" alt="foto">
-                <div class="container-ver-imagen d-flex align-items-center justify-content-center">
-                    <div (click)="abrirVistaPrevia()">
-                        <button class="btn btn-secondary verImagen icono-btn">Ver imagen</button>
-                    </div>
+        <div class="container-foto">
+            <img [src]="publicacion.urlImg" alt="foto">
+            <div class="container-ver-imagen d-flex align-items-center justify-content-center">
+                <div (click)="abrirVistaPrevia()">
+                    <button class="btn btn-secondary verImagen icono-btn">Ver imagen</button>
                 </div>
             </div>
+        </div>
         }
 
         <div class="d-flex justify-content-between align-items-center container-stats">
             <div class="d-flex justify-content-center align-items-center">
                 @if(publicacion.meGustaId.includes(getSub))
                 {
-                    <div (click)="likear()">
-                        <img src="/assets/Like-Rojo.svg" alt="likeRojo" class="icono">
-                    </div>
+                <div (click)="likear()">
+                    <img src="/assets/Like-Rojo.svg" alt="likeRojo" class="icono">
+                </div>
                 }
                 @else
                 {
-                    <div (click)="likear()">
-                        <img src="/assets/Like.svg" alt="like" class="icono">
-                    </div>
+                <div (click)="likear()">
+                    <img src="/assets/Like.svg" alt="like" class="icono">
+                </div>
                 }
                 <p class="m-0">{{publicacion.meGusta}}</p>
             </div>
@@ -61,12 +62,11 @@
             <div class="d-flex justify-content-center align-items-center">
                 @if(!this.cargandoComentarios())
                 {
-                    <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3"
-                        (click)="expandirComentarios()">
+                <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3" (click)="expandirComentarios()">
                 }
                 @else
                 {
-                    <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3 cargando">
+                <img src="/assets/Comentarios.svg" alt="iconoComent" class="icono ms-3 cargando">
                 }
                 <p class="m-0">{{publicacion.comentarios.length}}</p>
             </div>
@@ -79,52 +79,54 @@
 
         @if(publicacion.descripcion)
         {
-            <div class="descripcion text-center mb-4 mt-2">
-                <p class="m-0">{{ publicacion.descripcion | truncate:120 }}</p>
-            </div>
+        <div class="descripcion text-center mb-4 mt-2">
+            <p class="m-0">{{ publicacion.descripcion | truncate:60 }}</p>
+        </div>
         }
 
         @if(mostrarComentarios())
         {
-            <div class="container-comentarios" [class.con-scroll]="paginaActualComentarios > 1" [class.sin-scroll]="paginaActualComentarios === 1">
-                @for (comentario of this.comentarios(); track $index)
-                {
-                    <div class="d-flex align-items-center gap-2 mb-3 container-comentario">
-                        <div class="view usuario-comentario">
-                            @if(comentario.usuario.avatar)
-                            {
-                                <img [src]="comentario.usuario.avatar" alt="miAvatar">
+        <div class="container-comentarios" [class.con-scroll]="paginaActualComentarios > 1"
+            [class.sin-scroll]="paginaActualComentarios === 1">
+            @for (comentario of this.comentarios(); track $index)
+            {
+            <div class="d-flex align-items-center gap-2 mb-3 container-comentario">
+                <div class="view usuario-comentario">
+                    @if(comentario.usuario.avatar)
+                    {
+                    <img [src]="comentario.usuario.avatar" alt="miAvatar">
+                    }
+                    @else
+                    {
+                    <img src="/assets/User.svg" alt="avatar" width="55px">
+                    }
+                </div>
+                <div class="box-comment d-flex align-items-center">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2">
+                            <small>{{comentario.usuario.nombreUsuario}}</small>
+                            @if(comentario.created_at) {
+                            <small class="text-white-50 ms-2" style="font-size: 10px;">{{comentario.created_at |
+                                date:'dd-MM-yyyy HH:mm'}}</small>
                             }
-                            @else
-                            {
-                                <img src="/assets/User.svg" alt="avatar" width="55px">
+                            @if(comentario.modificado) {
+                            <span class="badge-editado">editado</span>
                             }
                         </div>
-                         <div class="box-comment d-flex align-items-center">
-                             <div class="d-flex flex-column">
-                                 <div class="d-flex align-items-center gap-2">
-                                   <small>{{comentario.usuario.nombreUsuario}}</small>
-                                   @if(comentario.created_at) {
-                                     <small class="text-white-50 ms-2" style="font-size: 10px;">{{comentario.created_at | date:'dd-MM-yyyy HH:mm'}}</small>
-                                   }
-                                   @if(comentario.modificado) {
-                                     <span class="badge-editado">editado</span>
-                                   }
-                                 </div>
-                                 <p class="m-0 descripcion">{{comentario.texto}}</p>
-                             </div>
-                         </div>
+                        <p class="m-0 descripcion">{{comentario.texto}}</p>
                     </div>
-                }
-                @if(this.hayMasComentarios() && !this.cargandoComentarios())
-                {
-                    <div class="d-flex align-items-center justify-content-center mb-1">
-                        <button class="btn btn-secondary rounded-4 btn-sm" (click)="cargarMasComentarios()">Cargar Más</button>
-                    </div>
-                }      
+                </div>
             </div>
+            }
+            @if(this.hayMasComentarios() && !this.cargandoComentarios())
+            {
+            <div class="d-flex align-items-center justify-content-center mb-1">
+                <button class="btn btn-secondary rounded-4 btn-sm" (click)="cargarMasComentarios()">Cargar Más</button>
+            </div>
+            }
+        </div>
 
-            <!-- 
+        <!-- 
             <div class="d-flex align-items-center gap-2 mt-2">
                 <div class="view imagen-comentario">
                     @if(getAvatar)
