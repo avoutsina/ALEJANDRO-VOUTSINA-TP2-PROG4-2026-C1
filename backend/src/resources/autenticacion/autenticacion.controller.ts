@@ -23,7 +23,7 @@ export class AutenticacionController {
   constructor(
     private readonly autenticacionService: AutenticacionService,
     private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   @Post('login')
   login(@Body() body: CredencialesDto) {
@@ -45,11 +45,10 @@ export class AutenticacionController {
     return this.autenticacionService.register(body);
   }
 
-  /**
-   * Requisito sprint:
-   * - autorizar: valida token y devuelve datos usuario.
-   * - si token inválido/vencido => 401.
-   */
+
+  //autorizar: valida token y devuelve datos usuario.
+  //si token inválido/vencido => 401.
+
   @Post('autorizar')
   @HttpCode(200)
   async autorizar(@Headers('Authorization') authHeader: string) {
@@ -57,10 +56,8 @@ export class AutenticacionController {
     return this.autenticacionService.autorizar(authHeader);
   }
 
-  /**
-   * Requisito sprint:
-   * - refrescar: valida token actual y devuelve nuevo JWT con misma payload y exp 15m.
-   */
+
+  //refrescar: valida token actual y devuelve nuevo JWT con misma payload y exp 15m.
   @Post('refrescar')
   @HttpCode(200)
   async refrescar(@Headers('Authorization') authHeader: string) {
