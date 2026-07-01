@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 export class imagen {
   public imagen = signal<File | null>(null);
   public urlFoto = signal<string | null>(null);
-  public reviewUrl?: string; // para vista previa
+  public reviewUrl?: string;
 
   mostrarImagen(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
@@ -21,7 +21,7 @@ export class imagen {
     );
   }
 
- 
+
   async delete() {
     throw new Error('Supabase eliminado: no se usa imagen.delete().');
   }
