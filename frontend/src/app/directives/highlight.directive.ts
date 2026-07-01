@@ -5,17 +5,24 @@ import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/
   standalone: true
 })
 export class HighlightDirective {
-  @Input() appHighlightColor: string = 'rgba(54, 162, 235, 0.15)';
+  @Input() appHighlightColor: string = 'rgba(255, 255, 255, 0.1)';
 
   constructor(private el: ElementRef, private renderer: Renderer2) {
-    this.renderer.setStyle(this.el.nativeElement, 'transition', 'background-color 0.3s ease');
+    this.renderer.setStyle(this.el.nativeElement, 'transition', 'all 0.3s ease');
   }
 
   @HostListener('mouseenter') onMouseEnter() {
-    this.renderer.setStyle(this.el.nativeElement, 'background-color', this.appHighlightColor);
+    // Como los td tienen color fijo en el CSS, cambiamos el color directamente a los td hijos
+    const tds = this.el.nativeElement.querySelectorAll('td');
+    tds.forEach((td: HTMLElement) => {
+      this.renderer.setStyle(td, 'background-color', 'rgb(24, 60, 72)');
+    });
   }
 
   @HostListener('mouseleave') onMouseLeave() {
-    this.renderer.setStyle(this.el.nativeElement, 'background-color', null);
+    const tds = this.el.nativeElement.querySelectorAll('td');
+    tds.forEach((td: HTMLElement) => {
+      this.renderer.setStyle(td, 'background-color', 'rgb(14, 39, 48)');
+    });
   }
 }
