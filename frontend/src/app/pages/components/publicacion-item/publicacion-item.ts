@@ -6,11 +6,13 @@ import { PublicacionM, Comentario } from '../../../interfaces/publicacion';
 import { PublicacionesUsuario } from '../../../services/publicacionesUsuario';
 import { Auth } from '../../../services/auth';
 import Swal from 'sweetalert2';
+import { TruncatePipe } from '../../../pipes/truncate-pipe';
+import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
 
 @Component({
   selector: 'app-publicacion-item',
   standalone: true,
-  imports: [TitleCasePipe, DatePipe, FormsModule, RouterLink],
+  imports: [TitleCasePipe, DatePipe, FormsModule, RouterLink, TruncatePipe, TimeAgoPipe],
   templateUrl: './publicacion-item.html',
   styleUrl: './publicacion-item.css',
 })

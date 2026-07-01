@@ -72,7 +72,7 @@
             </div>
 
             <div class="d-flex flex-column align-items-end gap-1">
-                <p class="m-0">{{publicacion.created_at | date:'dd-MM-yyyy' }}</p>
+                <p class="m-0 text-white-50" style="font-size: 13px;">{{ publicacion.created_at | timeAgo }}</p>
                 <a class="link-detalle" [routerLink]="['/detalle', publicacion._id]">Ver publicación →</a>
             </div>
         </div>
@@ -80,7 +80,7 @@
         @if(publicacion.descripcion)
         {
             <div class="descripcion text-center mb-4 mt-2">
-                <p class="m-0">{{publicacion.descripcion}}</p>
+                <p class="m-0">{{ publicacion.descripcion | truncate:120 }}</p>
             </div>
         }
 
